@@ -8,5 +8,6 @@ int main (int argc, char *argv[])
 	puts("Second line.");
 	puts("Third line.");
 	puts("Last fourth line.");
+
 	return 0;
 }
