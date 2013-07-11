@@ -1,5 +1,4 @@
 CFLAGS=-Wall -g
-all:
-	make ex1
+all: ex1
 clean:
 	rm -f ex1
