@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+// Go back to some of the other programs that use arrays and try to use pointers instead.
 int main(int argc, char *argv[])
 {
 	int i = 0;
@@ -9,7 +10,7 @@ int main(int argc, char *argv[])
 	} else if(argc > 1 && argc < 4) {
 		printf("Here's your arguments:\n");
 		for(i = 0; i < argc; i++) {
-			printf("%s ", argv[i]);
+			printf("%s ", *(argv + i));
 		}
 		printf("\n");
 	} else {

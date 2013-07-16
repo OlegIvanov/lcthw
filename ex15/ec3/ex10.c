@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+// Go back to some of the other programs that use arrays and try to use pointers instead.
 int main(int argc, char *argv[])
 {
 	int i = 0;
@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 	// go through each string in argv
 	// Why am I skipping argv[0]?
 	for(i = 1; i < argc; i++) {
-		printf("arg %d: %s\n", i, argv[i]);
+		printf("arg %d: %s\n", i, *(argv + i));
 	}
 
 	// let's make our own array of strings
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	int num_states = 4;
 	
 	for(i = 0; i < num_states; i++) {
-		printf("state %d: %s\n", i, states[i]);
+		printf("state %d: %s\n", i, *(states + i));
 	}
 
 	return 0;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+// Go back to some of the other programs that use arrays and try to use pointers instead.
 int main(int argc, char *argv[])
 {
 	if(argc != 2) {
@@ -9,8 +10,8 @@ int main(int argc, char *argv[])
 	}
 
 	int i = 0;
-	for(i = 0; argv[1][i] != '\0'; i++) {
-		char letter = argv[1][i];
+	for(i = 0; *(*(argv + 1) + i) != '\0'; i++) {
+		char letter = *(*(argv + 1) + i);
 		
 		switch(letter) {
 			case 'a':
