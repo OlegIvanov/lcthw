@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+// Rewrite all the pointer usage so they're arrays.
 int main(int argc, char *argv[])
 {
 	// create two arrays we care about
