@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
 	// second way using pointers
 	for(i = 0; i < count; i++) {
 		printf("%s is %d years old.\n", 
-				*(cur_name+i), *(cur_age+i));
+				*(cur_age+2*i), *(cur_age+i));
 	}
-
+	
 	printf("---\n");
 
 	// third way, pointers are just arrays
