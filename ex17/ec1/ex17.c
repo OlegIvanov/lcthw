@@ -116,11 +116,12 @@ void Database_close(struct Connection *conn)
 		if(conn->file) {
 			fclose(conn->file);
 		}
-		if(conn->db) {
+		struct Database *db = conn->db;
+		if(db) {
 			struct Address *rows = conn->db->rows;
 			if(rows) {
 				int i = 0;
-				for(i = 0; i < conn->db->max_rows; i++) {
+				for(i = 0; i < db->max_rows; i++) {
 					if((rows + i)->name) {
 						free((rows + i)->name);
 					}
@@ -130,7 +131,7 @@ void Database_close(struct Connection *conn)
 				}
 				free(rows);
 			}
-			free(conn->db);
+			free(db);
 		}
 		free(conn);
 	}
@@ -191,7 +192,8 @@ void Database_create(struct Connection *conn)
 			.id = i, 
 			.set = 0, 
 			.name = cur_row->name,
-			.email = cur_row->email};
+			.email = cur_row->email
+		};
 		// then just assign it
 		*cur_row = addr;
 	}
