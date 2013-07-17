@@ -117,13 +117,18 @@ void Database_close(struct Connection *conn)
 			fclose(conn->file);
 		}
 		if(conn->db) {
-			if(conn->db->rows) {
+			struct Address *rows = conn->db->rows;
+			if(rows) {
 				int i = 0;
 				for(i = 0; i < conn->db->max_rows; i++) {
-					free((conn->db->rows + i)->name);
-					free((conn->db->rows + i)->email);
+					if((rows + i)->name) {
+						free((rows + i)->name);
+					}
+					if((rows + i)->email) {
+						free((rows + i)->email);
+					}
 				}
-				free(conn->db->rows);
+				free(rows);
 			}
 			free(conn->db);
 		}
