@@ -261,19 +261,20 @@ int main(int argc, char *argv[])
 	char *filename = argv[1];
 	char action = argv[2][0];
 	struct Connection *conn = Database_open(filename, action);
+	struct Database *db = conn->db;
 	int id = 0;
 
 	switch(action) {
 		case 'c':
-			conn->db->max_rows = atoi(argv[3]);
-			conn->db->max_data = atoi(argv[4]);
+			db->max_rows = atoi(argv[3]);
+			db->max_data = atoi(argv[4]);
 			break;
 		case 'g':
 		case 's':
 		case 'd':
 			id = atoi(argv[3]);
 
-			if(id >= conn->db->max_rows) die("There's not that many records.", conn);
+			if(id >= db->max_rows) die("There's not that many records.", conn);
 			break;
 	}
 
@@ -306,7 +307,6 @@ int main(int argc, char *argv[])
 			break;
 		
 		case 'l':
-	
 			Database_list(conn);
 			break;
 		default:
