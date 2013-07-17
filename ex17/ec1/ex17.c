@@ -101,6 +101,8 @@ struct Connection *Database_open(const char *filename, char mode)
 		conn->file = fopen(filename, "w");
 	} else { 
 		conn->file = fopen(filename, "r+");
+
+		Database_load(conn);
 	}
 	
 	if(!conn->file) die("Failed to open the file", conn);
@@ -138,13 +140,13 @@ void Database_write(struct Connection *conn)
 		rc = fwrite(&cur_row->id, sizeof(int), 1, conn->file);
 		if(rc != 1) die("Failed to write id.", conn);
 
-		rc = fread(&cur_row->set, sizeof(int), 1, conn->file);
+		rc = fwrite(&cur_row->set, sizeof(int), 1, conn->file);
 		if(rc != 1) die("Failed to write set.", conn);
 
-		rc = fread(cur_row->name, db->max_data, 1, conn->file);
+		rc = fwrite(cur_row->name, db->max_data, 1, conn->file);
 		if(rc != 1) die("Failed to write name.", conn);
 
-		rc = fread(cur_row->email, db->max_data, 1, conn->file);
+		rc = fwrite(cur_row->email, db->max_data, 1, conn->file);
 		if(rc != 1) die("Failed to write email.", conn);
 	}
 
@@ -168,7 +170,11 @@ void Database_create(struct Connection *conn)
 		cur_row->email = malloc(db->max_data);
 		
 		// make a prototype to initialize it
-		struct Address addr = {.id = i, .set = 0};
+		struct Address addr = {
+			.id = i, 
+			.set = 0, 
+			.name = cur_row->name,
+			.email = cur_row->email};
 		// then just assign it
 		*cur_row = addr;
 	}
@@ -236,17 +242,17 @@ int main(int argc, char *argv[])
 	char action = argv[2][0];
 	struct Connection *conn = Database_open(filename, action);
 	int id = 0;
-	int max_rows, max_data = 0;
 
 	switch(action) {
 		case 'c':
-			max_rows = atoi(argv[3]);
-			max_data = atoi(argv[4]);
+			conn->db->max_rows = atoi(argv[3]);
+			conn->db->max_data = atoi(argv[4]);
 			break;
 		case 'g':
 		case 's':
 		case 'd':
 			id = atoi(argv[3]);
+
 			if(id >= conn->db->max_rows) die("There's not that many records.", conn);
 			break;
 	}
@@ -254,20 +260,20 @@ int main(int argc, char *argv[])
 	switch(action) {
 		case 'c':
 			if (argc != 5) die("Need max_rows, max_data to make database proxy", conn);
-
+			
 			Database_create(conn);
 			Database_write(conn);
 			break;
 
 		case 'g':
 			if(argc != 4) die("Need an id to get", conn);
-
+			
 			Database_get(conn, id);
 			break;
 
 		case 's':
 			if(argc != 6) die("Need id, name, email to set", conn);
-
+			
 			Database_set(conn, id, argv[4], argv[5]);
 			Database_write(conn);
 			break;
@@ -280,6 +286,7 @@ int main(int argc, char *argv[])
 			break;
 		
 		case 'l':
+	
 			Database_list(conn);
 			break;
 		default:
