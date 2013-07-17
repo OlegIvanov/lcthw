@@ -6,6 +6,10 @@
 
 // The die function needs to be augmented to let you pass the conn variable so it can close it and clean up.
 
+// Change the code to accept parameters for MAX_DATA and MAX_ROWS,
+// store them in the Database struct, and write that to the file, 
+// thus creating a database that can be arbitrarily sized.
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
