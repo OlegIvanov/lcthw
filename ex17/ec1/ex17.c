@@ -280,7 +280,9 @@ int Get_search_parameters(int argc, char **argv, struct Connection *conn)
 	int i = 0;
 	char *equality_sign = NULL;
 	int field_len = 0;
-	struct SearchParameter *cur_sp = NULL;	
+	struct SearchParameter *cur_sp = NULL;
+
+	char die_message[30];
 
 	for(i = 0; i < sp_count; i++) {
 		cur_sp = sp + i;
@@ -291,6 +293,14 @@ int Get_search_parameters(int argc, char **argv, struct Connection *conn)
 		cur_sp->field[field_len] = '\0';
 
 		strcpy(cur_sp->value, equality_sign + 1);
+
+		if(!(strcmp(cur_sp->field, "id") == 0) &&
+		  	!(strcmp(cur_sp->field, "name") == 0) &&
+		  	!(strcmp(cur_sp->field, "email") == 0)) {
+			
+			sprintf(die_message, "There's no such field in database as \"%s\".\n", cur_sp->field);
+			die(die_message, conn);
+		}
 	}
 
 	return sp_count;
