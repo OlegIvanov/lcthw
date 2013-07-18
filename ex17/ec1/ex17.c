@@ -268,6 +268,9 @@ int main(int argc, char *argv[])
 		case 'c':
 			db->max_rows = atoi(argv[3]);
 			db->max_data = atoi(argv[4]);
+
+			if(db->max_rows <= 0) die("There's too few rows.", conn);
+			if(db->max_data <= 1) die("There's not enough place to store name or email.", conn);
 			break;
 		case 'g':
 		case 's':
@@ -275,6 +278,7 @@ int main(int argc, char *argv[])
 			id = atoi(argv[3]);
 
 			if(id >= db->max_rows) die("There's not that many records.", conn);
+			if(id < 0) die("Negative indexes are not acceptable.", conn);
 			break;
 	}
 
