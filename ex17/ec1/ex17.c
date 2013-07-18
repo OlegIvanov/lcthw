@@ -131,7 +131,7 @@ void Database_close(struct Connection *conn)
 		}
 		struct Database *db = conn->db;
 		if(db) {
-			struct Address *rows = conn->db->rows;
+			struct Address *rows = db->rows;
 			if(rows) {
 				int i = 0;
 				for(i = 0; i < db->max_rows; i++) {
@@ -292,8 +292,6 @@ int Get_search_parameters(int argc, char **argv, struct Connection *conn)
 
 		strcpy(cur_sp->value, equality_sign + 1);
 	}
-
-	printf("%s\n", conn->sp->field);
 
 	return sp_count;
 }
