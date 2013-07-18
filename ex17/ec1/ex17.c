@@ -10,6 +10,8 @@
 // store them in the Database struct, and write that to the file, 
 // thus creating a database that can be arbitrarily sized.
 
+// Add more operations you can do on the database, like find.
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -272,7 +274,7 @@ int main(int argc, char *argv[])
 			db->max_rows = atoi(argv[3]);
 			db->max_data = atoi(argv[4]);
 
-			if(db->max_rows <= 0) die("There's too few rows.", conn);
+			if(db->max_rows <= 1) die("There's too few rows.", conn);
 			if(db->max_data <= 1) die("There's not enough place to store name or email.", conn);
 			break;
 		case 'g':
