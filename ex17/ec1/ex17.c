@@ -23,6 +23,7 @@
 struct Address {
 	int id;
 	int set;
+	int age;
 	char *name;
 	char *email;
 };
@@ -61,8 +62,8 @@ void die(const char *message, struct Connection *conn)
 
 void Address_print(struct Address *addr)
 {
-	printf("%d %s %s\n",
-			addr->id, addr->name, addr->email);
+	printf("%d %s %d %s\n",
+			addr->id, addr->name, addr->age, addr->email);
 }
 
 void Database_load(struct Connection *conn)
@@ -88,6 +89,9 @@ void Database_load(struct Connection *conn)
 
 		rc = fread(&cur_row->set, sizeof(int), 1, conn->file);
 		if (rc != 1) die("Failed to load set.", conn);
+
+		rc = fread(&cur_row->age, sizeof(int), 1, conn->file);
+		if (rc != 1) die("Failed to load age.", conn);
 
 		cur_row->name = malloc(db->max_data);
 		rc = fread(cur_row->name, db->max_data, 1, conn->file);
@@ -174,6 +178,9 @@ void Database_write(struct Connection *conn)
 		rc = fwrite(&cur_row->set, sizeof(int), 1, conn->file);
 		if(rc != 1) die("Failed to write set.", conn);
 
+		rc = fwrite(&cur_row->age, sizeof(int), 1, conn->file);
+		if(rc != 1) die("Failed to write age.", conn);
+
 		rc = fwrite(cur_row->name, db->max_data, 1, conn->file);
 		if(rc != 1) die("Failed to write name.", conn);
 
@@ -206,6 +213,7 @@ void Database_create(struct Connection *conn)
 		// make a prototype to initialize it
 		struct Address addr = {
 			.id = i, 
+			.age = 0,
 			.set = 0, 
 			.name = cur_row->name,
 			.email = cur_row->email
@@ -215,7 +223,7 @@ void Database_create(struct Connection *conn)
 	}
 }
 
-void Database_set(struct Connection *conn, int id, const char *name, const char *email)
+void Database_set(struct Connection *conn, int id, int age, const char *name, const char *email)
 {
 	struct Address *addr = &conn->db->rows[id];
 	if(addr->set) die("Already set, delete it first", conn);
@@ -223,6 +231,9 @@ void Database_set(struct Connection *conn, int id, const char *name, const char 
 	int max_data = conn->db->max_data;
 
 	addr->set = 1;
+
+	addr->age = age;
+
 	// Warning: bug, read the "How To Break It" and fix this
 	char *res = strncpy(addr->name, name, max_data);
 	// Bug has been fixed.
@@ -295,6 +306,7 @@ int Get_search_parameters(int argc, char **argv, struct Connection *conn)
 		strcpy(cur_sp->value, equality_sign + 1);
 
 		if(!(strcmp(cur_sp->field, "id") == 0) &&
+			!(strcmp(cur_sp->field, "age") == 0) &&
 		  	!(strcmp(cur_sp->field, "name") == 0) &&
 		  	!(strcmp(cur_sp->field, "email") == 0)) {
 			
@@ -335,6 +347,12 @@ void Database_find(struct Connection *conn, int sp_count)
 			
 				if(!(cur_row->id == id)) row_found = 0;
 			}
+
+			if(strcmp(cur_sp->field, "age") == 0) {
+				int age = atoi(cur_sp->value);
+			
+				if(!(cur_row->age == age)) row_found = 0;
+			}
 			
 			if(strcmp(cur_sp->field, "name") == 0) {
 				if(!(strcmp(cur_row->name, cur_sp->value) == 0)) row_found = 0;
@@ -358,6 +376,7 @@ int main(int argc, char *argv[])
 	struct Connection *conn = Database_open(filename, action);
 	struct Database *db = conn->db;
 	int id = 0;
+	int age = 0;
 	int sp_count = 0;
 
 	switch(action) {
@@ -368,14 +387,18 @@ int main(int argc, char *argv[])
 			if(db->max_rows < 1) die("There's too few rows.", conn);
 			if(db->max_data < 2) die("There's not enough place to store name or email.", conn);
 			break;
-		case 'g':
+
 		case 's':
+			age = atoi(argv[4]);
+			if(age < 0) die("Negative age isn't acceptable.", conn);
+		case 'g':
 		case 'd':
 			id = atoi(argv[3]);
 
 			if(id >= db->max_rows) die("There's not that many records.", conn);
 			if(id < 0) die("Negative indexes are not acceptable.", conn);
 			break;
+
 		case 'f':
 			sp_count = Get_search_parameters(argc, argv, conn);
 			break;
@@ -396,9 +419,9 @@ int main(int argc, char *argv[])
 			break;
 
 		case 's':
-			if(argc != 6) die("Need id, name, email to set", conn);
+			if(argc != 7) die("Need id, age, name, email to set", conn);
 			
-			Database_set(conn, id, argv[4], argv[5]);
+			Database_set(conn, id, age, argv[4], argv[5]);
 			Database_write(conn);
 			break;
 
