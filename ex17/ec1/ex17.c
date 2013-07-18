@@ -62,8 +62,11 @@ void die(const char *message, struct Connection *conn)
 
 void Address_print(struct Address *addr)
 {
-	printf("%d %s %d %s\n",
-			addr->id, addr->name, addr->age, addr->email);
+	printf("id: %5d\tname: %20s\tage: %5d\temail: %20s\n",
+			addr->id,
+			addr->name,
+			addr->age,
+			addr->email);
 }
 
 void Database_load(struct Connection *conn)
@@ -231,7 +234,6 @@ void Database_set(struct Connection *conn, int id, int age, const char *name, co
 	int max_data = conn->db->max_data;
 
 	addr->set = 1;
-
 	addr->age = age;
 
 	// Warning: bug, read the "How To Break It" and fix this
@@ -421,7 +423,7 @@ int main(int argc, char *argv[])
 		case 's':
 			if(argc != 7) die("Need id, age, name, email to set", conn);
 			
-			Database_set(conn, id, age, argv[4], argv[5]);
+			Database_set(conn, id, age, argv[5], argv[6]);
 			Database_write(conn);
 			break;
 

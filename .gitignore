@@ -2,4 +2,5 @@
 !**/
 !*.c
 !Makefile
+!*.sh
 !.gitignore
