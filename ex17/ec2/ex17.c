@@ -47,7 +47,7 @@ struct Connection {
 	struct SearchParameter *sp;
 };
 
-static struct Connection *conn;
+struct Connection conn;
 
 void Database_close();
 
@@ -75,12 +75,12 @@ void Address_print(struct Address *addr)
 
 void Database_load()
 {
-	struct Database *db = conn->db;
+	struct Database *db = conn.db;
 	
-	int rc = fread(&db->max_rows, sizeof(int), 1, conn->file);
+	int rc = fread(&db->max_rows, sizeof(int), 1, conn.file);
 	if (rc != 1) die("Failed to load max_rows.");
 
-	rc = fread(&db->max_data, sizeof(int), 1, conn->file);
+	rc = fread(&db->max_data, sizeof(int), 1, conn.file);
 	if (rc != 1) die("Failed to load max_data.");
 
 	db->rows = malloc(db->max_rows * sizeof(struct Address));
@@ -91,84 +91,78 @@ void Database_load()
 	for(i = 0; i < db->max_rows; i++) {
 		cur_row = db->rows + i;
 
-		rc = fread(&cur_row->id, sizeof(int), 1, conn->file);
+		rc = fread(&cur_row->id, sizeof(int), 1, conn.file);
 		if (rc != 1) die("Failed to load id.");
 
-		rc = fread(&cur_row->set, sizeof(int), 1, conn->file);
+		rc = fread(&cur_row->set, sizeof(int), 1, conn.file);
 		if (rc != 1) die("Failed to load set.");
 
-		rc = fread(&cur_row->age, sizeof(int), 1, conn->file);
+		rc = fread(&cur_row->age, sizeof(int), 1, conn.file);
 		if (rc != 1) die("Failed to load age.");
 
 		cur_row->name = malloc(db->max_data);
-		rc = fread(cur_row->name, db->max_data, 1, conn->file);
+		rc = fread(cur_row->name, db->max_data, 1, conn.file);
 		if (rc != 1) die("Failed to load name.");
 
 		cur_row->email = malloc(db->max_data);
-		rc = fread(cur_row->email, db->max_data, 1, conn->file);
+		rc = fread(cur_row->email, db->max_data, 1, conn.file);
 		if (rc != 1) die("Failed to load email.");
 	}
 }
 
 void Database_open(const char *filename, char mode)
 {
-	conn = malloc(sizeof(struct Connection));
-	if(!conn) die("Memory error");
-	
-	conn->db = malloc(sizeof(struct Database));
-	if(!conn->db) die("Memory error");
+	conn.db = malloc(sizeof(struct Database));
+	if(!conn.db) die("Memory error");
 
 	if(mode == 'c') {
-		conn->file = fopen(filename, "w");
+		conn.file = fopen(filename, "w");
 	} else { 
-		conn->file = fopen(filename, "r+");
+		conn.file = fopen(filename, "r+");
 
 		Database_load(conn);
 	}
 	
-	if(!conn->file) die("Failed to open the file");
+	if(!conn.file) die("Failed to open the file");
 }
 
 void Database_close()
 {
-	if(conn) {
-		if(conn->file) {
-			fclose(conn->file);
-		}
-		if(conn->sp) {
-			free(conn->sp);
-		}
-		struct Database *db = conn->db;
-		if(db) {
-			struct Address *rows = db->rows;
-			if(rows) {
-				int i = 0;
-				for(i = 0; i < db->max_rows; i++) {
-					if((rows + i)->name) {
-						free((rows + i)->name);
-					}
-					if((rows + i)->email) {
-						free((rows + i)->email);
-					}
+	if(conn.file) {
+		fclose(conn.file);
+	}
+	if(conn.sp) {
+		free(conn.sp);
+	}
+	struct Database *db = conn.db;
+	if(db) {
+		struct Address *rows = db->rows;
+		if(rows) {
+			int i = 0;
+			for(i = 0; i < db->max_rows; i++) {
+				if((rows + i)->name) {
+					free((rows + i)->name);
 				}
-				free(rows);
+				if((rows + i)->email) {
+					free((rows + i)->email);
+				}
 			}
-			free(db);
+			free(rows);
 		}
-		free(conn);
+		free(db);
 	}
 }
 
 void Database_write()
 {
-	struct Database *db = conn->db;
+	struct Database *db = conn.db;
 
-	rewind(conn->file);
+	rewind(conn.file);
 
-	int rc = fwrite(&db->max_rows, sizeof(int), 1, conn->file);
+	int rc = fwrite(&db->max_rows, sizeof(int), 1, conn.file);
 	if(rc != 1) die("Failed to write max_rows.");
 
-	rc = fwrite(&db->max_data, sizeof(int), 1, conn->file);
+	rc = fwrite(&db->max_data, sizeof(int), 1, conn.file);
 	if(rc != 1) die("Failed to write max_data.");
 
 	int i = 0;
@@ -177,29 +171,29 @@ void Database_write()
 	for(i = 0; i < db->max_rows; i++) {
 		cur_row = db->rows + i;
 
-		rc = fwrite(&cur_row->id, sizeof(int), 1, conn->file);
+		rc = fwrite(&cur_row->id, sizeof(int), 1, conn.file);
 		if(rc != 1) die("Failed to write id.");
 
-		rc = fwrite(&cur_row->set, sizeof(int), 1, conn->file);
+		rc = fwrite(&cur_row->set, sizeof(int), 1, conn.file);
 		if(rc != 1) die("Failed to write set.");
 
-		rc = fwrite(&cur_row->age, sizeof(int), 1, conn->file);
+		rc = fwrite(&cur_row->age, sizeof(int), 1, conn.file);
 		if(rc != 1) die("Failed to write age.");
 
-		rc = fwrite(cur_row->name, db->max_data, 1, conn->file);
+		rc = fwrite(cur_row->name, db->max_data, 1, conn.file);
 		if(rc != 1) die("Failed to write name.");
 
-		rc = fwrite(cur_row->email, db->max_data, 1, conn->file);
+		rc = fwrite(cur_row->email, db->max_data, 1, conn.file);
 		if(rc != 1) die("Failed to write email.");
 	}
 
-	rc = fflush(conn->file);
+	rc = fflush(conn.file);
 	if(rc == -1) die("Cannot flush database.");
 }
 
 void Database_create()
 {
-	struct Database *db = conn->db;
+	struct Database *db = conn.db;
 
 	db->rows = malloc(db->max_rows * sizeof(struct Address));
 	
@@ -230,10 +224,10 @@ void Database_create()
 
 void Database_set(int id, int age, const char *name, const char *email)
 {
-	struct Address *addr = &conn->db->rows[id];
+	struct Address *addr = &conn.db->rows[id];
 	if(addr->set) die("Already set, delete it first");
 
-	int max_data = conn->db->max_data;
+	int max_data = conn.db->max_data;
 
 	addr->set = 1;
 	addr->age = age;
@@ -255,7 +249,7 @@ void Database_set(int id, int age, const char *name, const char *email)
 
 void Database_get(int id)
 {
-	struct Address *addr = &conn->db->rows[id];
+	struct Address *addr = &conn.db->rows[id];
 
 	if(addr->set) {
 		Address_print(addr);
@@ -266,7 +260,7 @@ void Database_get(int id)
 
 void Database_delete(int id)
 {
-	struct Address *rows = conn->db->rows;
+	struct Address *rows = conn.db->rows;
 
 	(rows + id)->set = 0;
 }
@@ -274,7 +268,7 @@ void Database_delete(int id)
 void Database_list()
 {
 	int i = 0;
-	struct Database *db = conn->db;
+	struct Database *db = conn.db;
 	
 	for(i = 0; i < db->max_rows; i++) {
 		struct Address *cur = &db->rows[i];
@@ -288,10 +282,10 @@ void Database_list()
 int Get_search_parameters(int argc, char **argv)
 {
 	int sp_count = argc - 3;
-	conn->sp = malloc(sp_count * sizeof(struct SearchParameter));
-	if(!conn->sp) die("Memory error");
+	conn.sp = malloc(sp_count * sizeof(struct SearchParameter));
+	if(!conn.sp) die("Memory error");
 	
-	struct SearchParameter *sp = conn->sp;
+	struct SearchParameter *sp = conn.sp;
 	int i = 0;
 	char *equality_sign = NULL;
 	int field_len = 0;
@@ -326,12 +320,12 @@ void Database_find(int sp_count)
 {
 	int i = 0;
 	int j = 0;
-	struct Database *db = conn->db;
+	struct Database *db = conn.db;
 	
 	struct Address *rows = db->rows;
 	struct Address *cur_row = NULL;
 	
-	struct SearchParameter *sp = conn->sp;
+	struct SearchParameter *sp = conn.sp;
 	struct SearchParameter *cur_sp = NULL;
 
 	int row_found = 0;
@@ -378,7 +372,7 @@ int main(int argc, char *argv[])
 	char *filename = argv[1];
 	char action = argv[2][0];
 	Database_open(filename, action);
-	struct Database *db = conn->db;
+	struct Database *db = conn.db;
 	int id = 0;
 	int age = 0;
 	int sp_count = 0;
