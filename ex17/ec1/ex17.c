@@ -12,6 +12,8 @@
 
 // Add more operations you can do on the database, like find.
 
+// Add some more fields to the Address and make them searchable.
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -34,6 +36,12 @@ struct Database {
 struct Connection {
 	FILE *file;
 	struct Database *db;
+	struct SearchParameter *sp;
+};
+
+struct SearchParameter {
+	char field[10];
+	char value[1000];
 };
 
 void Database_close(struct Connection*);
@@ -117,6 +125,9 @@ void Database_close(struct Connection *conn)
 	if(conn) {
 		if(conn->file) {
 			fclose(conn->file);
+		}
+		if(conn->sp) {
+			free(conn->sp);
 		}
 		struct Database *db = conn->db;
 		if(db) {
@@ -259,6 +270,64 @@ void Database_list(struct Connection *conn)
 	}
 }
 
+int Get_search_parameters(int argc, char **argv, struct Connection *conn)
+{
+	int sp_count = argc - 3;
+	conn->sp = malloc(sp_count * sizeof(struct SearchParameter));
+	if(!conn->sp) die("Memory error", conn);
+	
+	struct SearchParameter *sp = conn->sp;
+	int i = 0;
+	char *equality_sign = NULL;
+	int field_len = 0;
+	struct SearchParameter *cur_sp = NULL;	
+
+	for(i = 0; i < sp_count; i++) {
+		cur_sp = sp + i;
+		equality_sign = strrchr(argv[i + 3], '=');
+		field_len = equality_sign - &argv[i + 3][0];
+
+		strncpy(cur_sp->field, argv[i + 3], field_len);
+		cur_sp->field[field_len] = '\0';
+
+		strcpy(cur_sp->value, equality_sign + 1);
+	}
+
+	printf("%s\n", conn->sp->field);
+
+	return sp_count;
+}
+
+void Database_find(struct Connection *conn, int sp_count)
+{
+	int i = 0;
+	struct Database *db = conn->db;
+	struct Address *rows = db->rows;
+	struct Address *cur_row = NULL;
+	struct SearchParameter *sp = conn->sp;
+	int j = 0;
+	int row_found = 0;
+	struct SearchParameter *cur_sp = NULL;
+
+	for(i = 0; i < db->max_rows; i++) {
+		cur_row = rows + i;
+
+		if(cur_row->set == 0) continue;
+		
+		int row_found = 0;
+		
+		for(j = 0; j < sp_count; j++) {
+			cur_sp = sp + j;
+				
+			if(strcmp(cur_sp->field, "id")) {
+				
+			}
+		}
+
+		Address_print(cur_row);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	if(argc < 3) die("USAGE: ex17 <dbfile> <action> [action params]", NULL);
@@ -268,6 +337,7 @@ int main(int argc, char *argv[])
 	struct Connection *conn = Database_open(filename, action);
 	struct Database *db = conn->db;
 	int id = 0;
+	int sp_count = 0;
 
 	switch(action) {
 		case 'c':
@@ -284,6 +354,9 @@ int main(int argc, char *argv[])
 
 			if(id >= db->max_rows) die("There's not that many records.", conn);
 			if(id < 0) die("Negative indexes are not acceptable.", conn);
+			break;
+		case 'f':
+			sp_count = Get_search_parameters(argc, argv, conn);
 			break;
 	}
 
@@ -318,10 +391,15 @@ int main(int argc, char *argv[])
 		case 'l':
 			Database_list(conn);
 			break;
+
+		case 'f':
+			Database_find(conn, sp_count);
+			break;
+
 		default:
 			die("Invalid action, only: c=create, g=get, s=set, d=del, l=list", conn);
 	}
-
+	
 	Database_close(conn);
 
 	return 0;
