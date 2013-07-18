@@ -274,8 +274,8 @@ int main(int argc, char *argv[])
 			db->max_rows = atoi(argv[3]);
 			db->max_data = atoi(argv[4]);
 
-			if(db->max_rows <= 1) die("There's too few rows.", conn);
-			if(db->max_data <= 1) die("There's not enough place to store name or email.", conn);
+			if(db->max_rows < 1) die("There's too few rows.", conn);
+			if(db->max_data < 2) die("There's not enough place to store name or email.", conn);
 			break;
 		case 'g':
 		case 's':
