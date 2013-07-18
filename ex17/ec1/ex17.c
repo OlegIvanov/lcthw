@@ -185,7 +185,10 @@ void Database_create(struct Connection *conn)
 		cur_row = db->rows + i;
 		
 		cur_row->name = malloc(db->max_data);
+		memset(cur_row->name, '\0', db->max_data);
+
 		cur_row->email = malloc(db->max_data);
+		memset(cur_row->email, '\0', db->max_data);
 		
 		// make a prototype to initialize it
 		struct Address addr = {
