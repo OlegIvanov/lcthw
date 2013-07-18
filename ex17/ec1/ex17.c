@@ -19,8 +19,8 @@
 struct Address {
 	int id;
 	int set;
-	char* name;
-	char* email;
+	char *name;
+	char *email;
 };
 
 struct Database {
