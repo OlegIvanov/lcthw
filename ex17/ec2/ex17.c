@@ -14,6 +14,8 @@
 
 // Add some more fields to the Address and make them searchable.
 
+// Try reworking the program to use a single global for the database connection.
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -34,15 +36,15 @@ struct Database {
 	struct Address *rows;
 };
 
+struct SearchParameter {
+	char field[10];
+	char value[1000];
+};
+
 struct Connection {
 	FILE *file;
 	struct Database *db;
 	struct SearchParameter *sp;
-};
-
-struct SearchParameter {
-	char field[10];
-	char value[1000];
 };
 
 void Database_close(struct Connection*);
