@@ -299,30 +299,43 @@ int Get_search_parameters(int argc, char **argv, struct Connection *conn)
 void Database_find(struct Connection *conn, int sp_count)
 {
 	int i = 0;
+	int j = 0;
 	struct Database *db = conn->db;
+	
 	struct Address *rows = db->rows;
 	struct Address *cur_row = NULL;
+	
 	struct SearchParameter *sp = conn->sp;
-	int j = 0;
-	int row_found = 0;
 	struct SearchParameter *cur_sp = NULL;
+
+	int row_found = 0;
 
 	for(i = 0; i < db->max_rows; i++) {
 		cur_row = rows + i;
 
 		if(cur_row->set == 0) continue;
 		
-		int row_found = 0;
+		row_found = 1;
 		
 		for(j = 0; j < sp_count; j++) {
 			cur_sp = sp + j;
-				
-			if(strcmp(cur_sp->field, "id")) {
-				
+	
+			if(strcmp(cur_sp->field, "id") == 0) {
+				int id = atoi(cur_sp->value);
+			
+				if(!(cur_row->id == id)) row_found = 0;
+			}
+			
+			if(strcmp(cur_sp->field, "name") == 0) {
+				if(!(strcmp(cur_row->name, cur_sp->value) == 0)) row_found = 0;
+			}
+
+			if(strcmp(cur_sp->field, "email") == 0) {
+				if(!(strcmp(cur_row->email, cur_sp->value) == 0)) row_found = 0;
 			}
 		}
-
-		Address_print(cur_row);
+		
+		if (row_found) Address_print(cur_row);
 	}
 }
 
@@ -395,7 +408,7 @@ int main(int argc, char *argv[])
 			break;
 
 		default:
-			die("Invalid action, only: c=create, g=get, s=set, d=del, l=list", conn);
+			die("Invalid action, only: c=create, g=get, s=set, d=del, l=list, f=find", conn);
 	}
 	
 	Database_close(conn);
