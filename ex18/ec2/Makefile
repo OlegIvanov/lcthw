@@ -1,4 +1,4 @@
 CFLAGS=-Wall -g
-all: ec2
+all: ex18
 clean:
-	rm -f ec2
+	rm -f ex18
