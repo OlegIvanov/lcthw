@@ -23,7 +23,7 @@ void die(const char *message)
 // case for a function pointer
 typedef int (*compare_cb)(int a, int b);
 
-typedef int* (*find_min_max_cb)(int*, int);
+typedef int* (*find_cb)(int*, int);
 
 typedef int* (*sort_function)(int*, int, void*);
 
@@ -31,7 +31,7 @@ typedef int* (*sort_function)(int*, int, void*);
  * A classic bubble sort function that uses the
  * compare_cb to do the sorting.
  */
-int *bubble_sort(int *numbers, int count, void* sort_order_function)
+int *bubble_sort(int *numbers, int count, void* sort_order)
 {
 	int temp = 0;
 	int i = 0;
@@ -42,7 +42,7 @@ int *bubble_sort(int *numbers, int count, void* sort_order_function)
 
 	memcpy(target, numbers, count * sizeof(int));
 
-	compare_cb cmp = sort_order_function;
+	compare_cb cmp = sort_order;
 	
 	for(i = 0; i < count; i++) {
 		for(j = 0; j < count - 1; j++) {
@@ -57,25 +57,29 @@ int *bubble_sort(int *numbers, int count, void* sort_order_function)
 	return target;
 }
 
-int *selection_sort(int *numbers, int count, void* sort_order_function)
+/**
+ * A classic selection sort function that uses the
+ * find_cb to do the sorting.
+ */
+int *selection_sort(int *numbers, int count, void* sort_order)
 {
 	int temp = 0;
 	int i = 0;
-	int *addr = NULL;
+	int *found_addr = NULL;
 
 	int *target = malloc(count * sizeof(int));
 	if(!target) die("Memory error.");
 
 	memcpy(target, numbers, count * sizeof(int));
 
-	find_min_max_cb fnd = sort_order_function;
+	find_cb fnd = sort_order;
 
 	for(i = 0; i < count - 1; i++) {
-		addr = fnd(target + i, count - i);
+		found_addr = fnd(target + i, count - i);
 		
 		temp = *(target + i);
-		*(target + i) = *addr;
-		*addr = temp;
+		*(target + i) = *found_addr;
+		*found_addr = temp;
 	}
 
 	return target;
@@ -136,11 +140,11 @@ int strange_order(int a, int b)
  * Used to test that we are sorting things correctly
  * by doing the sort and printing it out.
  */
-void test_sorting(int *numbers, int count, sort_function sf, void* sort_order_function)
+void test_sorting(int *numbers, int count, sort_function sf, void* sort_order)
 {
 	int i = 0;
 
-	int *sorted = sf(numbers, count, sort_order_function);
+	int *sorted = sf(numbers, count, sort_order);
 
 	if(!sorted) die("Failed to sort as requested.");
 
