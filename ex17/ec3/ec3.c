@@ -34,8 +34,13 @@ void die(const char *message)
 struct Stack *Stack_create(int capacity)
 {
 	struct Stack *st = malloc(sizeof(struct Stack));
+	if(!st) die("Memory error.");
+
 	st->capacity = capacity;
+
 	st->elements = malloc(st->capacity * sizeof(int));
+	if(!st->elements) die("Memory error.");
+
 	st->top = st->elements + st->capacity;
 
 	return st;
