@@ -36,7 +36,7 @@ int *bubble_sort(int *numbers, int count, compare_cb cmp)
 
 	for(i = 0; i < count; i++) {
 		for(j = 0; j < count - 1; j++) {
-			if(cmp(target[j], target[j+1] > 0)) {
+			if(cmp(target[j], target[j+1]) > 0) {
 				temp = target[j+1];
 				target[j+1] = target[j];
 				target[j] = temp;
