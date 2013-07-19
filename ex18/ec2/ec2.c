@@ -23,11 +23,13 @@ void die(const char *message)
 // case for a function pointer
 typedef int (*compare_cb)(int a, int b);
 
+typedef int* (*sort_function)(int*, int, void*);
+
 /**
  * A classic bubble sort function that uses the
  * compare_cb to do the sorting.
  */
-int *bubble_sort(int *numbers, int count, compare_cb cmp)
+int *bubble_sort(int *numbers, int count, void* sort_order_function)
 {
 	int temp = 0;
 	int i = 0;
@@ -38,6 +40,8 @@ int *bubble_sort(int *numbers, int count, compare_cb cmp)
 
 	memcpy(target, numbers, count * sizeof(int));
 
+	compare_cb cmp = sort_order_function;
+	
 	for(i = 0; i < count; i++) {
 		for(j = 0; j < count - 1; j++) {
 			if(cmp(target[j], target[j+1]) > 0) {
@@ -74,10 +78,11 @@ int strange_order(int a, int b)
  * Used to test that we are sorting things correctly
  * by doing the sort and printing it out.
  */
-void test_sorting(int *numbers, int count, compare_cb cmp)
+void test_sorting(int *numbers, int count, sort_function sf, void* sort_order_function)
 {
 	int i = 0;
-	int *sorted = bubble_sort(numbers, count, cmp);
+
+	int *sorted = sf(numbers, count, sort_order_function);
 
 	if(!sorted) die("Failed to sort as requested.");
 
@@ -104,9 +109,9 @@ int main(int argc, char *argv[])
 		numbers[i] = atoi(inputs[i]);
 	}
 
-	test_sorting(numbers, count, sorted_order);
-	test_sorting(numbers, count, reverse_order);
-	test_sorting(numbers, count, strange_order);
+	test_sorting(numbers, count, bubble_sort, sorted_order);
+	test_sorting(numbers, count, bubble_sort, reverse_order);
+	test_sorting(numbers, count, bubble_sort, strange_order);
 
 	free(numbers);
 
