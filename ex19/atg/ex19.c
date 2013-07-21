@@ -1,13 +1,37 @@
+// At the top of each function, add asserts that make sure the input parameters are correct. 
+// For example, in Object_new you want a assert(description != NULL).
+
+// Go through each line of the function, and find any functions being called. 
+// Read the documentation (man page) for that function, and confirm what it returns for an error. 
+// Add another assert to check that the error didn't happen. 
+// For example, in Object_new you need one after the call to calloc that does assert(el != NULL).
+
+// If a function is expected to return a value, 
+// either make sure it returns an error value (like NULL), 
+// or have an assert to make sure that the returned variable isn't invalid. 
+// For example, in Object_new, you need to have assert(el != NULL) again 
+// before the last return since that part can never be NULL.
+
+// For every if-statement you write, make sure there's an else clause unless 
+// that if is an error check that causes an exit.
+
+// For every switch-statement you write, make sure that 
+// there's a default case that handles anything you didn't anticipate.
+
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 #include "ex19.h"
 
 
 int Monster_attack(void *self, int damage)
 {
+	assert(self);
+	assert(damage >= 0);
+
 	Monster *monster = self;
 
 	printf("You attack %s!\n", monster->_(description));
@@ -25,6 +49,8 @@ int Monster_attack(void *self, int damage)
 
 int Monster_init(void *self)
 {
+	assert(self);
+
 	Monster *monster = self;
 	monster->hit_points = 10;
 	return 1;
@@ -37,6 +63,8 @@ Object MonsterProto = {
 
 void *Room_move(void *self, Direction direction)
 {
+	assert(self);
+
 	Room *room = self;
 	Room *next = NULL;
 	
@@ -66,6 +94,9 @@ void *Room_move(void *self, Direction direction)
 
 int Room_attack(void *self, int damage)
 {
+	assert(self);
+	assert(damage >= 0);
+	
 	Room *room = self;
 	Monster *monster = room->bad_guy;
 
@@ -85,6 +116,9 @@ Object RoomProto = {
 
 void *Map_move(void *self, Direction direction)
 {
+	assert(self);
+	assert(((Map*)self)->location);
+
 	Map *map = self;
 	Room *location = map->location;
 	Room *next = NULL;
@@ -100,6 +134,9 @@ void *Map_move(void *self, Direction direction)
 
 int Map_attack(void *self, int damage)
 {
+	assert(self);
+	assert(((Map*)self)->location);
+
 	Map *map = self;
 	Room *location = map->location;
 
@@ -108,6 +145,8 @@ int Map_attack(void *self, int damage)
 
 int Map_init(void *self)
 {
+	assert(self);
+
 	Map *map = self;
 	
 	// make some room for a small map
@@ -144,6 +183,8 @@ Object MapProto = {
 
 int process_input(Map *game)
 {
+	assert(game);
+
 	printf("\n> ");
 
 	char ch = getchar();
