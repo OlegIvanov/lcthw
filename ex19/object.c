@@ -4,7 +4,7 @@
 #include "object.h"
 #include <assert.h>
 
-void Object_dectroy(void *self)
+void Object_destroy(void *self)
 {
 	Object *obj = self;
 
