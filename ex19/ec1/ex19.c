@@ -18,6 +18,8 @@
 // For every switch-statement you write, make sure that 
 // there's a default case that handles anything you didn't anticipate.
 
+// Add more rooms and monsters to the game.
+
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -155,8 +157,15 @@ int Map_init(void *self)
 	Room *arena = NEW(Room, "The arena, with the minotaur");
 	Room *kitchen = NEW(Room,"Kitchen, you have the knife now");
 
+	Room *pantry = NEW(Room, "Pantry, eat something unless goddamned monsters have eaten everything");
+	Room *bedroom = NEW(Room, "Bedroom, you've successfully banged monster's daughters");
+	Room *toilet = NEW(Room, "Toilet, you can finally take a crap");
+
 	// put the bad guy in the arena
 	arena->bad_guy = NEW(Monster, "The evil minotaur");
+
+	// put the bad guy in the bedroom
+	bedroom->bad_guy = NEW(Monster, "Troll for fucking in the asshole");
 
 	// setup the map rooms
 	hall->north = throne;
@@ -166,7 +175,17 @@ int Map_init(void *self)
 	throne->south = hall;
 
 	arena->east = throne;
+	arena->north = pantry;
+
 	kitchen->west = throne;
+	kitchen->north = bedroom;
+
+	pantry->south = arena;
+
+	bedroom->south = kitchen;
+	bedroom->east = toilet;
+
+	toilet->west = bedroom;
 
 	// start the map and the character off in the hall
 	map->start = hall;
