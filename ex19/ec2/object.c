@@ -1,28 +1,8 @@
-// At the top of each function, add asserts that make sure the input parameters are correct. 
-// For example, in Object_new you want a assert(description != NULL).
-
-// Go through each line of the function, and find any functions being called. 
-// Read the documentation (man page) for that function, and confirm what it returns for an error. 
-// Add another assert to check that the error didn't happen. 
-// For example, in Object_new you need one after the call to calloc that does assert(el != NULL).
-
-// If a function is expected to return a value, 
-// either make sure it returns an error value (like NULL), 
-// or have an assert to make sure that the returned variable isn't invalid. 
-// For example, in Object_new, you need to have assert(el != NULL) again 
-// before the last return since that part can never be NULL.
-
-// For every if-statement you write, make sure there's an else clause unless 
-// that if is an error check that causes an exit.
-
-// For every switch-statement you write, make sure that 
-// there's a default case that handles anything you didn't anticipate.
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "object.h"
 #include <assert.h>
+#include "object.h"
 
 void Object_destroy(void *self)
 {
