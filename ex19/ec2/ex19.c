@@ -8,7 +8,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
-#include "ex19.h"
+#include "gm.h"
 
 extern Object MonsterProto;
 extern Object RoomProto;
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 	printf("You enter the ");
 	game->location->_(describe)(game->location);
 
-	while(process_input(game)) {}
+	while(process_input(game));
 
 	return 0;
 }
