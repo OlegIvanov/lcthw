@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 	int i = 0;
 
 	struct timespec start, end;
-	double diff_normal, diff_duff, diff_zed;
+	double diff;
 
 	// setup the from to have some stuff
 	memset(from, 'x', SIZE);
@@ -94,15 +94,15 @@ int main(int argc, char *argv[])
 	check(valid_copy(to, SIZE, 'y'), "Not initialized right.");
 
 	// use normal copy to
-	clock_gettime(CLOCK_REALTIME, &start);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 	for(i = 0; i < 100; i++) {
 		rc = normal_copy(from, to, SIZE);
 	} 
-	clock_gettime(CLOCK_REALTIME, &end);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
-	diff_normal = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
+	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
 
-	log_info("Normal copy took %lf seconds to run.", diff_normal);
+	log_info("Normal copy took %lf seconds to run.", diff);
 
 	check(rc == SIZE, "Normal copy failed: %d", rc);
 	check(valid_copy(to, SIZE, 'x'), "Normal copy failed.");
@@ -111,15 +111,15 @@ int main(int argc, char *argv[])
 	memset(to, 'y', SIZE);
 
 	// duffs version
-	clock_gettime(CLOCK_REALTIME, &start);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 	for(i = 0; i < 100; i++) {
 		rc = duffs_device(from, to, SIZE);
 	}
-	clock_gettime(CLOCK_REALTIME, &end);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
-	diff_duff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
+	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
 
-	log_info("Duff copy took %lf seconds to run.", diff_duff);
+	log_info("Duff copy took %lf seconds to run.", diff);
 
 	check(rc == SIZE, "Duff's device failed: %d", rc);
 	check(valid_copy(to, SIZE, 'x'), "Duff's device failed copy.");
@@ -128,15 +128,15 @@ int main(int argc, char *argv[])
 	memset(to, 'y', SIZE);
 
 	// my version
-	clock_gettime(CLOCK_REALTIME, &start);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 	for(i = 0; i < 100; i++) {
 		rc = zeds_device(from, to, SIZE);
 	}
-	clock_gettime(CLOCK_REALTIME, &end);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
-	diff_zed = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
+	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
 
-	log_info("Zed copy took %lf seconds to run.", diff_zed);
+	log_info("Zed copy took %lf seconds to run.", diff);
 	
 	check(rc == SIZE, "Zed's device failed: %d", rc);
 	check(valid_copy(to, SIZE, 'x'), "Zed's device failed copy.");
