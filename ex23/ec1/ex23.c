@@ -1,6 +1,13 @@
+// Create a set of macros that lets you create any length device like this. 
+// For example, what if you wanted to have 32 case statements and didn't want to write out all of them? 
+// Can you do a macro that lays down 8 at a time?
+
 #include <stdio.h>
 #include <string.h>
 #include "dbg.h"
+#include "ex23.h"
+
+#define DL 32
 
 int normal_copy(char *from, char *to, int count)
 {
@@ -16,18 +23,14 @@ int normal_copy(char *from, char *to, int count)
 int duffs_device(char *from, char *to, int count)
 {
 	{
-		int n = (count + 7) / 8;
+		int n = (count + DL - 1) / DL;
 		
-		switch(count % 8) {
-			case 0: do { *to++ = *from++;
-						case 7: *to++ = *from++;
-						case 6: *to++ = *from++;
-						case 5: *to++ = *from++;
-						case 4: *to++ = *from++;
-						case 3: *to++ = *from++;
-						case 2: *to++ = *from++;
-						case 1: *to++ = *from++;				
-					} while(--n > 0);
+		switch(count % DL) {
+			case 0: 
+				do { 
+					*to++ = *from++;
+					DUFFS_CASES
+				} while(--n > 0);
 		}
 	}
 
