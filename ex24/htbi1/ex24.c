@@ -23,7 +23,7 @@ typedef struct Person {
 int main(int argc, char *argv[])
 {
 	Person you = {.age = 0};
-	int i = 1;
+	int i = 0;
 	char *in = NULL;
 
 	// To demonstrate the problems with fscanf and strings, 
