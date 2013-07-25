@@ -26,10 +26,38 @@ int main(int argc, char *argv[])
 	int i = 1;
 	char *in = NULL;
 
+	// To demonstrate the problems with fscanf and strings, 
+	// change the lines that use fgets so they are fscanf(stdin, "%50s", you.first_name) 
+	// and then try to use it again. 
+	// Notice it seems to read too much and then eat your enter key? 
+	// This doesn't do what you think it does, 
+	// and really rather than deal with weird scanf issues, just use fgets.
+	
+	/*
+	printf("What's your First Name? ");
+	fscanf(stdin, "%50s", you.first_name);
+
+	printf("What's your Last Name? ");
+	fscanf(stdin, "%50s", you.last_name);
+	*/
+
+	// Next, change the fgets to use gets, then bust out your valgrind and do this: 
+	// valgrind ./ex24 < /dev/urandom to feed random garbage into your program.
+	
+	/*
+	printf("What's your First Name? ");
+	in = gets(you.first_name);
+	check(in != NULL, "Failed to read first name.");
+	
+	printf("What's your Last Name? ");
+	in = gets(you.last_name);
+	check(in != NULL, "Failed to read last name.");
+	*/
+	
 	printf("What's your First Name? ");
 	in = fgets(you.first_name, MAX_DATA - 1, stdin);
 	check(in != NULL, "Failed to read first name.");
-
+	
 	printf("What's your Last Name? ");
 	in = fgets(you.last_name, MAX_DATA - 1, stdin);
 	check(in != NULL, "Failed to read last name.");
@@ -43,13 +71,18 @@ int main(int argc, char *argv[])
 		printf("%d) %s\n", i + 1, EYE_COLOR_NAMES[i]);
 	}
 	printf("> ");
-	
+
 	int eyes = -1;
 	rc = fscanf(stdin, "%d", &eyes);
 	check(rc > 0, "You have to enter a number.");
 
+	// Finally, take the input for you.eyes and remove the check that the number given is within the right range.
+	// Then feed it bad numbers like -1 or 1000. Do this under Valgrind too so you can see what happens.
+
 	you.eyes = eyes - 1;
+	/*
 	check(you.eyes <= OTHER_EYES && you.eyes >= 0, "Do it right, that's not an option.");
+	*/
 
 	printf("How much do you make an hour? ");
 	rc = fscanf(stdin, "%f", &you.income);
