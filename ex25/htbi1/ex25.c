@@ -5,15 +5,37 @@
 #include <stdarg.h>
 #include "dbg.h"
 
+#define MAX_DATA 5
+
+/*
 #define MAX_DATA 100
+*/
 
 int read_string(char **out_string, int max_buffer)
 {
+	// Try also giving it more data than MAX_DATA, 
+	// and then see how not using calloc in read_string changes how it works.
+	
+	/*	
 	*out_string = calloc(1, max_buffer + 1);
 	check_mem(*out_string);
+	*/
 
-	char *result = fgets(*out_string, max_buffer, stdin);
-	check(result != NULL, "Input error.");
+	*out_string = calloc(1, max_buffer + 1);
+	check_mem(*out_string);
+	
+	// Finally, there's a problem that fgets eats the newlines, 
+	// so try to fix that using fgetc but leave out the \0 that ends the string.
+
+	int i = 0;
+	char c = '\0';
+	
+	for(i = 0, c = fgetc(stdin); 
+		i < max_buffer && c != '\n'; 
+		i++, c = fgetc(stdin)) {
+
+		*(*out_string + i) = c;
+	}
 
 	return 0;
 
@@ -95,13 +117,22 @@ error:
 	return -1;
 }
 
-
 int main(int argc, char *argv[])
 {
 	char *first_name = NULL;
 	char initial = ' ';
 	char *last_name = NULL;
 	int age = 0;
+	
+	// This program should be more robust against buffer overflows, 
+	// but it doesn't handle the formatted input as well as scanf. 
+	// To try breaking this, change the code that you forget to pass in the initial size for '%s' formats.
+	
+	/*
+	printf("What's your first name? ");
+	int rc = read_scan("%s", &first_name);
+	check(rc == 0, "Failed first name.");
+	*/
 
 	printf("What's your first name? ");
 	int rc = read_scan("%s", MAX_DATA, &first_name);
