@@ -1,3 +1,5 @@
+// Write a similar function to printf that uses the varargs system and rewrite main to use it.
+
 /** WARNING: This code fresh and potentially isn't correct yet. */
 
 #include <stdlib.h>
@@ -95,6 +97,58 @@ error:
 	return -1;
 }
 
+int write_print(const char *fmt, ...)
+{
+	int i = 0;
+	int rc = 0;
+	int int_param = 0;
+	char char_param = '\0';
+	char *string_param = NULL;
+
+	va_list argp;
+	va_start(argp, fmt);
+
+	for(i = 0; fmt[i] != '\0'; i++) {
+		if(fmt[i] == '%') {
+			i++;
+			switch(fmt[i]) {
+				case '\0':
+					sentinel("Invalid format, you ended with %%.");
+					break;
+				
+				case 'd':
+					int_param = va_arg(argp, int);
+					printf("%d", int_param);
+					check(rc == 0, "Failed to print int.");
+					break;
+
+				case 'c':
+					char_param = va_arg(argp, int);
+					printf("%c", char_param);
+					check(rc == 0, "Failed to print char.");
+					break;
+				
+				case 's':
+					string_param = va_arg(argp, char *);
+					printf("%s", string_param);
+					check(rc == 0, "Failed to print string.");
+					break;
+		
+				default:
+					sentinel("Invalid format.");
+			}
+		} else {
+			printf("%c", fmt[i]);
+		}
+	}
+
+	va_end(argp);
+	return 0;
+
+error:
+	va_end(argp);
+	return -1;
+}
 
 int main(int argc, char *argv[])
 {
@@ -117,16 +171,17 @@ int main(int argc, char *argv[])
 	
 	printf("How old are you? ");
 	rc = read_scan("%d", &age);
+	
+	rc = write_print("---- RESULTS ----\n");
+	check(rc == 0, "Failed print header.");
 
-	printf("---- RESULTS ----\n");
-	printf("First Name: %s", first_name);
-	printf("Initial: '%c'\n", initial);
-	printf("Last Name: %s", last_name);
-	printf("Age: %d\n", age);
-
+	write_print("First Name: %sInitial: '%c'\nLast Name: %sAge: %d\n", first_name, initial, last_name, age);
+	check(rc == 0, "Failed print person's data.");
+	
 	free(first_name);
 	free(last_name);
 	return 0;
+
 error:
 	return 1;
 }
