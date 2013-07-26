@@ -24,7 +24,6 @@ int main(int argc, const char const *argv[])
 	const char *make_opts = NULL;
 	const char *url = NULL;
 	enum CommandType request = COMMAND_NONE;
-
 	
 	rv = apr_getopt_init(&opt, p, argc, argv);
 
@@ -96,7 +95,6 @@ int main(int argc, const char const *argv[])
 		default:
 			sentinel("Invalid command given.");
 	}
-	
 	
 	return 0;
 
