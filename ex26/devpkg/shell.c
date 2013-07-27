@@ -17,6 +17,8 @@ int Shell_exec(Shell template, ...)
 
 	va_start(argp, template);
 
+	int replacement_count = 0;
+	
 	for(key = va_arg(argp, const char *);
 		key != NULL;
 		key = va_arg(argp, const char *))
@@ -26,10 +28,14 @@ int Shell_exec(Shell template, ...)
 		for(i = 0; template.args[i] != NULL; i++) {
 			if(strcmp(template.args[i], key) == 0) {
 				template.args[i] = arg;
+				replacement_count++;
 				break; // found it
 			}
 		}
 	}
+
+	check(replacement_count == template.args_for_replacement_number, 
+		"Not all arguments for replacement have been replaced.");
 
 	rc = Shell_run(p, &template);
 	apr_pool_destroy(p);
@@ -80,6 +86,7 @@ error:
 Shell CLEANUP_SH = {
 	.exe = "rm",
 	.dir = "/tmp",
+	.args_for_replacement_number = 0,
 	.args = {"rm", "-rf", "/tmp/pkg-build", "/tmp/pkg-src.tar.gz",
 		"/tmp/pkg-src.tar.bz2", "/tmp/DEPENDS", NULL}
 };
@@ -87,41 +94,48 @@ Shell CLEANUP_SH = {
 Shell GIT_SH = {
 	.dir = "/tmp",
 	.exe = "git",
+	.args_for_replacement_number = 1,
 	.args = {"git", "clone", "URL", "pkg-build", NULL}
 };
 
 Shell TAR_GZ_SH = {
 	.dir = "/tmp/pkg-build",
 	.exe = "tar",
+	.args_for_replacement_number = 1,
 	.args = {"tar", "-xzf", "FILE", "--strip-components", "1", NULL}
 };
 
 Shell TAR_BZ2_SH = {
 	.dir = "/tmp/pkg-build",
 	.exe = "tar",
+	.args_for_replacement_number = 1,
 	.args = {"tar", "-xvf", "FILE", "--strip-components", "1", NULL}
 };
 
 Shell CURL_SH = {
 	.dir = "/tmp",
 	.exe = "curl",
+	.args_for_replacement_number = 2,
 	.args = {"curl", "-L", "-o", "TARGET", "URL", NULL}
 };
 
 Shell CONFIGURE_SH = {
 	.exe = "./configure",
 	.dir = "/tmp/pkg-build",
+	.args_for_replacement_number = 1,
 	.args = {"configure", "OPTS", NULL}
 };
 
 Shell MAKE_SH = {
 	.exe = "make",
 	.dir = "/tmp/pkg-build",
+	.args_for_replacement_number = 1,
 	.args = {"make", "OPTS", NULL}
 };
 
 Shell INSTALL_SH = {
 	.exe = "sudo",
 	.dir = "/tmp/pkg-build",
+	.args_for_replacement_number = 1,
 	.args = {"sudo", "make", "TARGET", NULL}
 };

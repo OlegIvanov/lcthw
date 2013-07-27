@@ -14,6 +14,7 @@ typedef struct Shell {
 	apr_exit_why_e exit_why;
 	int exit_code;
 
+	const int args_for_replacement_number;
 	const char *args[MAX_COMMAND_ARGS];
 } Shell;
 
