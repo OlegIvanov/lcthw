@@ -6,10 +6,10 @@ rm -rf /usr/local/.devpkg
 ./devpkg -S
 
 # regular tar.gz
-./devpkg -I http://mirror.its.uidaho.edu/pub/apache//apr/apr-1.4.5.tar.gz
+./devpkg -I http://apache.ip-connect.vn.ua//apr/apr-1.4.8.tar.gz
 
 # regular tar.bz2
-./devpkg -I http://mongrel2.org/static/downloads/mongrel2-1.7.5.tar.bz2
+./devpkg -I ftp://ftp.ro.debian.org/pub/FreeBSD/ports/distfiles/mongrel2-1.7.5.tar.bz2
 
 # regular .git
 ./devpkg -I https://github.com/zedshaw/srpmin.git
@@ -20,12 +20,12 @@ rm -rf /usr/local/.devpkg
 ./devpkg -B https://github.com/zedshaw/srpmin.git
 
 # manually fetch/build it not installed
-./devpkg -F http://mirror.its.uidaho.edu/pub/apache//apr/apr-util-1.3.12.tar.gz
+./devpkg -F http://apache.ip-connect.vn.ua//apr/apr-util-1.5.2.tar.gz
 
-./devpkg -B http://mirror.its.uidaho.edu/pub/apache//apr/apr-util-1.3.12.tar.gz -c "--with-apr=/usr/local/apr"
+./devpkg -B http://apache.ip-connect.vn.ua//apr/apr-util-1.5.2.tar.gz -c "--with-apr=/usr/local/apr"
 
 # idempotent build test
-./devpkg -I http://mirror.its.uidaho.edu/pub/apache//apr/apr-util-1.3.12.tar.gz -c "--with-apr=/usr/local/apr"
+./devpkg -I http://apache.ip-connect.vn.ua//apr/apr-util-1.5.2.tar.gz -c "--with-apr=/usr/local/apr"
 
 
 # just run the depends, nothing should build
@@ -33,4 +33,3 @@ rm -rf /usr/local/.devpkg
 
 # list out what's installed
 ./devpkg -L
-

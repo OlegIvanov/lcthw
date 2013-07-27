@@ -69,17 +69,14 @@ int Command_fetch(apr_pool_t *p, const char *url, int fetch_only)
 		return 0;
 	} else if(apr_fnmatch(TAR_GZ_PAT, info.path, 0) == APR_SUCCESS) {
 		if(info.scheme) {
-			rc = Shell_exec(CURL_SH, 
-				"URL", url, 
-				"TARGET", TAR_GZ_SRC, NULL);
+			rc = Shell_exec(CURL_SH, "URL", url, "TARGET", TAR_GZ_SRC, NULL);
 			check(rc == 0, "Failed to curl source: %s.", url);
 		}
 		
-		rv = apr_dir_make_recursive(BUILD_DIR,
-				APR_UREAD | APR_UWRITE | APR_UEXECUTE, p);
+		rv = apr_dir_make_recursive(BUILD_DIR, APR_UREAD | APR_UWRITE | APR_UEXECUTE, p);
 		check(rv == APR_SUCCESS, "Failed to make directory %s", BUILD_DIR);
 
-		rc = Shell_exec(TAR_SH, "FILE", TAR_GZ_SRC, NULL);
+		rc = Shell_exec(TAR_GZ_SH, "FILE", TAR_GZ_SRC, NULL);
 		check(rc == 0, "Failed to untar %s", TAR_GZ_SRC);
 	} else if(apr_fnmatch(TAR_BZ2_PAT, info.path, 0) == APR_SUCCESS) {
 		if(info.scheme) {
@@ -87,11 +84,10 @@ int Command_fetch(apr_pool_t *p, const char *url, int fetch_only)
 			check(rc == 0, "Curl failed.");
 		}
 
-		apr_status_t rc = apr_dir_make_recursive(BUILD_DIR,
-				APR_UREAD | APR_UWRITE | APR_UEXECUTE, p);
+		rv = apr_dir_make_recursive(BUILD_DIR, APR_UREAD | APR_UWRITE | APR_UEXECUTE, p);
+		check(rv == APR_SUCCESS, "Failed to make directory %s", BUILD_DIR);
 
-		check(rc == 0, "Failed to make directory %s", BUILD_DIR);
-		rc = Shell_exec(TAR_SH, "FILE", TAR_BZ2_SRC, NULL);
+		rc = Shell_exec(TAR_BZ2_SH, "FILE", TAR_BZ2_SRC, NULL);
 		check(rc == 0, "Failed to untar %s", TAR_BZ2_SRC);
 	} else {
 		sentinel("Don't know how to handle %s", url);

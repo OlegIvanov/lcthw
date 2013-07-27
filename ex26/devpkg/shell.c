@@ -90,10 +90,16 @@ Shell GIT_SH = {
 	.args = {"git", "clone", "URL", "pkg-build", NULL}
 };
 
-Shell TAR_SH = {
+Shell TAR_GZ_SH = {
 	.dir = "/tmp/pkg-build",
 	.exe = "tar",
 	.args = {"tar", "-xzf", "FILE", "--strip-components", "1", NULL}
+};
+
+Shell TAR_BZ2_SH = {
+	.dir = "/tmp/pkg-build",
+	.exe = "tar",
+	.args = {"tar", "-xvf", "FILE", "--strip-components", "1", NULL}
 };
 
 Shell CURL_SH = {

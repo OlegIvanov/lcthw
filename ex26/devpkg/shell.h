@@ -22,7 +22,8 @@ int Shell_exec(Shell cmd, ...);
 
 extern Shell CLEANUP_SH;
 extern Shell GIT_SH;
-extern Shell TAR_SH;
+extern Shell TAR_GZ_SH;
+extern Shell TAR_BZ2_SH;
 extern Shell CURL_SH;
 extern Shell CONFIGURE_SH;
 extern Shell MAKE_SH;
