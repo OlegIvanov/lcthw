@@ -71,10 +71,14 @@ int Command_fetch(apr_pool_t *p, const char *url, int fetch_only)
 		if(info.scheme) {
 			rc = Shell_exec(CURL_SH, 
 				"URL", url, 
-				"TARGET", TAR_BZ2_SRC, NULL);
+				"TARGET", TAR_GZ_SRC, NULL);
 			check(rc == 0, "Failed to curl source: %s.", url);
 		}
 		
+		rv = apr_dir_make_recursive(BUILD_DIR,
+				APR_UREAD | APR_UWRITE | APR_UEXECUTE, p);
+		check(rv == APR_SUCCESS, "Failed to make directory %s", BUILD_DIR);
+
 		rc = Shell_exec(TAR_SH, "FILE", TAR_GZ_SRC, NULL);
 		check(rc == 0, "Failed to untar %s", TAR_GZ_SRC);
 	} else if(apr_fnmatch(TAR_BZ2_PAT, info.path, 0) == APR_SUCCESS) {
