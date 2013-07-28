@@ -9,7 +9,7 @@
 #include "dbg.h"
 #include <assert.h>
 
-#define MAX_DATA 5
+#define MAX_DATA 100
 
 typedef enum EyeColor {
 	BLUE_EYES, GREEN_EYES, BROWN_EYES,
