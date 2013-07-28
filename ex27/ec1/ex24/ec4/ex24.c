@@ -46,8 +46,10 @@ int read_name(char *name, int size)
 	*(name + i) = '\0';
 	
 	// skipping the rest of the line
-	scanf("%*[^\n]");
-	scanf ("%*c");
+	if(c != '\n') {
+		scanf("%*[^\n]");
+		scanf ("%*c");
+	}
 
 	return 0;
 
