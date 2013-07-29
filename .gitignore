@@ -6,4 +6,6 @@
 !*.sh
 !README
 !DEPENDS
+!README.md
+!LICENSE
 !.gitignore
