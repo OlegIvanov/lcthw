@@ -1,14 +1,17 @@
+TESTEXEC="tests/ex29_tests"
+LIBRARYPATH="/usr/local/lib/libex29.so"
+
 echo "try it out with some things that work"
-./ex29 ./libex29.so print_a_message "hello there"
-./ex29 ./libex29.so uppercase "hello there"
-./ex29 ./libex29.so lowercase "HELLO THERE"
-./ex29 ./libex29.so fail_on_purpose "i fail"
+$TESTEXEC $LIBRARYPATH print_a_message "hello there"
+$TESTEXEC $LIBRARYPATH uppercase "hello there"
+$TESTEXEC $LIBRARYPATH lowercase "HELLO THERE"
+$TESTEXEC $LIBRARYPATH fail_on_purpose "i fail"
 
 echo "try to give it bad args"
-./ex29 ./libex29.so fail_on_purpose
+$TESTEXEC $LIBRARYPATH fail_on_purpose
 
 echo "try calling a function that is not there"
-./ex29 ./libex29.so adfasfasdf asdfadff
+$TESTEXEC $LIBRARYPATH adfasfasdf asdfadff
 
 echo "try loading a .so that is not there"
-./ex29 ./libex.so adfasfasdf asdfadfas
+$TESTEXEC /usr/local/lib/libex.so adfasfasdf asdfadfas
