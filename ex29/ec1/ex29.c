@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	check(func != NULL, "Did not find %s function in the library %s: %s", func_to_run, lib_file, dlerror());
 
 	if(strcmp("uppercase", func_to_run) == 0 || strcmp("lowercase", func_to_run) == 0) {
-		rc = ((change_case_function)func)(data, sizeof(strlen(data) + 1));
+		rc = ((change_case_function)func)(data, strlen(data) + 1);
 	} else {
 		rc = ((lib_function)func)(data);
 	}
