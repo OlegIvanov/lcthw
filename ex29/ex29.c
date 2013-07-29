@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	char *func_to_run = argv[2];
 	char *data = argv[3];
 
-	void *lib dlopen(lib_file, RTLD_NOW);
+	void *lib = dlopen(lib_file, RTLD_NOW);
 	check(lib != NULL, "Failed to open the library %s: %s", lib_file, dlerror());
 
 	lib_function func = dlsym(lib, func_to_run);
