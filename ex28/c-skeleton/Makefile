@@ -48,7 +48,7 @@ clean:
 # The Install
 install: all
 		install -d $(DESTDIR)/$(PREFIX)/lib/
-		install $(TARGET) $(DETDIR)/$(PREFIX)/lib/
+		install $(TARGET) $(DESTDIR)/$(PREFIX)/lib/
 
 # The Checker
 BADFUNCS='^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)|stpn?cpy|a?sn?printf|byte_)'
