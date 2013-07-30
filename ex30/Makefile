@@ -31,8 +31,8 @@ build:
 
 # The Unit Tests
 .PHONY: tests
-tests: CFLAGS += $(TARGET)
-tests: $(TESTS)
+tests: 
+	$(CC) -g -Wall -DNDEBUG $(TEST_SRC) $(LIBS) -o $(TESTS)
 	sh ./tests/runtests.sh
 
 valgrind:
