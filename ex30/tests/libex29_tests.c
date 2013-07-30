@@ -1,7 +1,7 @@
 #include "minunit.h"
 #include <dlfcn.h>
 
-typedef int(*lib_function)(const char *data)
+typedef int (*lib_function)(const char *data);
 char *lib_file = "build/libYOUR_LIBRARY.so";
 void *lib = NULL;
 
