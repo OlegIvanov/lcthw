@@ -109,7 +109,7 @@ void *List_remove(List *list, ListNode *node)
 		ListNode *after = node->next;
 		ListNode *before = node->prev;
 		after->prev = before;
-		after->next = after;
+		before->next = after;
 	}
 
 	list->count--;
