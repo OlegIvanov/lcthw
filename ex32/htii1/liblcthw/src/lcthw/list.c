@@ -19,9 +19,6 @@ void List_clear_destroy(List *list)
 		}
 	}
 
-	if(list->last) {
-		free(list->last->value);
-	}
 	free(list->last);
 	free(list);
 }
