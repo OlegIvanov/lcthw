@@ -33,7 +33,7 @@ build:
 .PHONY: tests
 tests:
 	$(CC) -g -Wall -DNDEBUG $(TEST_SRC) $(LIBS) -o $(TESTS)
-	#sh ./tests/ex29_tests.sh
+	sh ./tests/runtests.sh
 
 valgrind:
 	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE)
