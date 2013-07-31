@@ -32,7 +32,7 @@ build:
 # The Unit Tests
 .PHONY: tests
 tests:
-	$(CC) -g -Wall -DNDEBUG $(TEST_SRC) $(LIBS) -o $(TESTS)
+	$(CC) -g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(TEST_SRC) $(TARGET) -o $(TESTS)
 	sh ./tests/runtests.sh
 
 valgrind:

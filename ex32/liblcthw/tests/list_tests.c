@@ -18,7 +18,7 @@ char *test_create()
 
 char *test_destroy()
 {
-	List_clear_destroy();
+	List_clear_destroy(list);
 
 	return NULL;
 }
