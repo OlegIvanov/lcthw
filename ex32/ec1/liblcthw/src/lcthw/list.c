@@ -1,6 +1,37 @@
 #include <lcthw/list.h>
 #include <lcthw/dbg.h>
 #include <assert.h>
+#include <unistd.h>
+
+#define BUF_SIZE 1000
+
+// Warning! Not portable!
+void Heap_get_range(void **heap_low, void **heap_high)
+{
+	char maps_filename[BUF_SIZE];
+	char file_line[BUF_SIZE];
+	const char *heap = "[heap]";
+
+	pid_t pid = getpid();
+
+	sprintf(maps_filename, "/proc/%d/maps", pid);
+	
+	FILE *maps_file = fopen(maps_filename, "r");
+	check(maps_file, "maps file has't been opened");
+
+	while(fgets(file_line, BUF_SIZE, maps_file) != NULL) {
+		if(strstr(file_line, heap) != NULL) {
+			break;
+		}
+	}
+		
+	sscanf(file_line, "%p-%p", heap_low, heap_high);
+
+	fclose(maps_file);
+
+error:
+	return;
+}
 
 List *List_create()
 {
@@ -11,9 +42,15 @@ void List_clear_destroy(List *list)
 {
 	assert(list != NULL && "list can't be NULL");
 
-	LIST_FOREACH(list, first, next, cur) {
-		free(cur->value);
+	void *heap_low = NULL;
+	void *heap_high = NULL;
 
+	Heap_get_range(&heap_low, &heap_high);
+	
+	LIST_FOREACH(list, first, next, cur) {
+		if(cur->value >= heap_low && cur->value <= heap_high) {
+			free(cur->value);
+		}
 		if(cur->prev) {
 			free(cur->prev);
 		}
@@ -120,4 +157,21 @@ void *List_remove(List *list, ListNode *node)
 
 error:
 	return result;
+}
+
+List *List_copy(List *list)
+{
+	assert(list != NULL && "list can't be NULL");
+	
+	List *list_copy = calloc(1, sizeof(List));
+	check_mem(list_copy);
+
+	LIST_FOREACH(list, first, next, cur) {
+		List_push(list_copy, cur->value);
+	}
+
+	return list_copy;
+
+error:
+	return NULL;
 }

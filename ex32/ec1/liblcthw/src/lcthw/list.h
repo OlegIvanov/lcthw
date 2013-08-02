@@ -32,6 +32,8 @@ void *List_shift(List *list);
 
 void *List_remove(List *list, ListNode *node);
 
+List *List_copy(List *list);
+
 #define LIST_FOREACH(L, S, M, V) ListNode *_node = NULL;\
 	ListNode *V = NULL;\
 	for(V = _node = L->S; _node != NULL; V = _node = _node->M)

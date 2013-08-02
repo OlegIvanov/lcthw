@@ -91,16 +91,38 @@ char *test_shift()
 	return NULL;
 }
 
+char *test_copy()
+{
+	List *list1 = List_create();
+
+	List_push(list1, test1);
+	List_push(list1, test2);
+	List_push(list1, test3);
+
+	List *list1_copy = List_copy(list1);
+
+	List_clear_destroy(list1);
+	
+	mu_assert(List_first(list1_copy) == test1, "Wrong first value.");
+	mu_assert(List_last(list1_copy) == test3, "Wrong last value.");
+	mu_assert(List_count(list1_copy) == 3, "Wrong count on copy.");
+
+	List_clear_destroy(list1_copy);
+
+	return NULL;
+}
 
 char *all_tests() {
 	mu_suite_start();
-	
+
 	mu_run_test(test_create);
 	mu_run_test(test_push_pop);
 	mu_run_test(test_unshift);
 	mu_run_test(test_remove);
 	mu_run_test(test_shift);
 	mu_run_test(test_destroy);
+
+	mu_run_test(test_copy);
 
 	return NULL;
 }
