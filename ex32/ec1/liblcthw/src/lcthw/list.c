@@ -178,7 +178,7 @@ error:
 }
 
 // Don't forget to pass in NULL for last parameter
-void List_join(List *list, ...)
+int List_join(List *list, ...)
 {
 	assert(list_start != NULL && "list_start can't be NULL");
 
@@ -191,17 +191,15 @@ void List_join(List *list, ...)
 		sub_list != NULL;
 		sub_list = va_arg(argp, List *)) {
 		
-		// if we don't have any elements in the sub_list
-		if(!sub_list->last) {
-			continue;
-		}
+		// if we have no elements in the sub_list
+		if(!sub_list->last) continue;
 		
-		// if we have some elements in the list
-		if(list->last) {
+		// if we have no elements in the list
+		if(!list->last) {
+			list->first = sub_list->first;
+		} else {
 			list->last->next = sub_list->first;
 			sub_list->first->prev = list->last;
-		} else {
-			list->first = sub_list->first;
 		}
 
 		list->last = sub_list->last;
@@ -214,10 +212,12 @@ void List_join(List *list, ...)
 	}
 
 	va_end(argp);
+
+	return 0;
 }
 
 // Don't forget to pass in NULL for last parameter
-void List_split(List *list, ...)
+int List_split(List *list, ...)
 {
 	assert(list != NULL && "list can't be NULL");
 
@@ -228,15 +228,14 @@ void List_split(List *list, ...)
 	List *sub_list = NULL;
 
 	LIST_FOREACH(list, first, next, cur) {
-		while(sub_list_count == 0) {
+		if(sub_list_count == 0) {
 			sub_list = va_arg(argp, List *);
+
 			if(!sub_list) break;
 
 			sub_list_count = va_arg(argp, int);
-			assert(sub_list_count >= 0 && "sub_list_count can't be negative");
+			check(sub_list_count > 0, "sub_list_count can't be negative");
 		}
-
-		if(!sub_list) break;
 
 		List_push(sub_list, cur->value);
 
@@ -244,4 +243,9 @@ void List_split(List *list, ...)
 	}
 
 	va_end(argp);
+
+	return 0;
+
+error:
+	return -1;
 }
