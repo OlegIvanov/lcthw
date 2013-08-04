@@ -2,6 +2,7 @@
 #include <lcthw/dbg.h>
 #include <assert.h>
 #include <unistd.h>
+#include <stdarg.h>
 
 #define BUF_SIZE 1000
 
@@ -174,4 +175,73 @@ List *List_copy(List *list)
 
 error:
 	return NULL;
+}
+
+// Don't forget to pass in NULL for last parameter
+void List_join(List *list, ...)
+{
+	assert(list_start != NULL && "list_start can't be NULL");
+
+	va_list	argp;
+	va_start(argp, list);
+
+	List *sub_list = NULL;
+
+	for(sub_list = va_arg(argp, List *);
+		sub_list != NULL;
+		sub_list = va_arg(argp, List *)) {
+		
+		// if we don't have any elements in the sub_list
+		if(!sub_list->last) {
+			continue;
+		}
+		
+		// if we have some elements in the list
+		if(list->last) {
+			list->last->next = sub_list->first;
+			sub_list->first->prev = list->last;
+		} else {
+			list->first = sub_list->first;
+		}
+
+		list->last = sub_list->last;
+
+		list->count += sub_list->count;
+		
+		// preparing for succesfull destruction
+		sub_list->first = NULL;
+		sub_list->last = NULL;
+	}
+
+	va_end(argp);
+}
+
+// Don't forget to pass in NULL for last parameter
+void List_split(List *list, ...)
+{
+	assert(list != NULL && "list can't be NULL");
+
+	va_list	argp;
+	va_start(argp, list);
+
+	int sub_list_count = 0;
+	List *sub_list = NULL;
+
+	LIST_FOREACH(list, first, next, cur) {
+		while(sub_list_count == 0) {
+			sub_list = va_arg(argp, List *);
+			if(!sub_list) break;
+
+			sub_list_count = va_arg(argp, int);
+			assert(sub_list_count >= 0 && "sub_list_count can't be negative");
+		}
+
+		if(!sub_list) break;
+
+		List_push(sub_list, cur->value);
+
+		sub_list_count--;
+	}
+
+	va_end(argp);
 }

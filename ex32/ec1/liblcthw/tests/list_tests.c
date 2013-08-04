@@ -6,7 +6,8 @@ static List *list = NULL;
 char *test1 = "test1 data";
 char *test2 = "test2 data";
 char *test3 = "test3 data";
-
+char *test4 = "test4 data";
+char *test5 = "test5 data";
 
 char *test_create()
 {
@@ -112,6 +113,93 @@ char *test_copy()
 	return NULL;
 }
 
+char *test_join()
+{
+	List *list1 = List_create();
+
+	List_push(list1, test1);
+
+	List *list2 = List_create();
+
+	List_push(list2, test2);
+	List_push(list2, test3);
+
+	List *list3 = List_create();
+	
+	List_push(list3, test4);
+	List_push(list3, test5);
+
+	List_join(list1, list2, list3, NULL);
+
+	List_clear_destroy(list2);
+	List_clear_destroy(list3);
+
+	mu_assert(List_first(list1) == test1, "Wrong first value.");
+	mu_assert(List_last(list1) == test5, "Wrong last value.");
+	mu_assert(List_count(list1) == 5, "Wrong count on join.");
+
+	List_clear_destroy(list1);
+
+	list1 = List_create();
+	list2 = List_create();
+	list3 = List_create();
+
+	List *list4 = List_create();
+
+	List_push(list4, test4);
+
+	List_join(list1, list2, list4, list3, NULL);
+
+	List_clear_destroy(list2);
+	List_clear_destroy(list3);
+	List_clear_destroy(list4);
+
+	mu_assert(List_first(list1) == test4, "Wrong first value.");
+	mu_assert(List_last(list1) == test4, "Wrong last value.");
+	mu_assert(List_count(list1) == 1, "Wrong count on join.");
+
+	List_clear_destroy(list1);
+
+	return NULL;
+}
+
+char *test_split()
+{
+	List *list1 = List_create();
+
+	List_push(list1, test1);
+	List_push(list1, test2);
+	List_push(list1, test3);
+	List_push(list1, test4);
+	List_push(list1, test5);
+
+	List *sub_list1 = List_create();
+	List *sub_list2 = List_create();
+	List *sub_list3 = List_create();
+
+	List_split(list1, sub_list1, 1, sub_list2, 2, sub_list3, 2);
+
+	List_clear_destroy(list1);
+
+	mu_assert(List_first(sub_list1) == test1, "Wrong first value.");
+	mu_assert(List_last(sub_list1) == test1, "Wrong last value.");
+	mu_assert(List_count(sub_list1) == 1, "Wrong count on split.");
+
+	mu_assert(List_first(sub_list2) == test2, "Wrong first value.");
+	mu_assert(List_last(sub_list2) == test3, "Wrong last value.");
+	mu_assert(List_count(sub_list2) == 2, "Wrong count on split.");
+
+	mu_assert(List_first(sub_list3) == test4, "Wrong first value.");
+	mu_assert(List_last(sub_list3) == test5, "Wrong last value.");
+	mu_assert(List_count(sub_list3) == 2, "Wrong count on split.");
+
+	List_clear_destroy(sub_list1);
+	List_clear_destroy(sub_list2);
+	List_clear_destroy(sub_list3);
+
+	return NULL;
+}
+
 char *all_tests() {
 	mu_suite_start();
 
@@ -123,6 +211,8 @@ char *all_tests() {
 	mu_run_test(test_destroy);
 
 	mu_run_test(test_copy);
+	mu_run_test(test_join);
+	mu_run_test(test_split);
 
 	return NULL;
 }
