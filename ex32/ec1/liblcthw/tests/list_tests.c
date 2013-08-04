@@ -240,6 +240,22 @@ char *test_split()
 	List_clear_destroy(sub_list2);
 	List_clear_destroy(sub_list3);
 
+	// third split test
+	list1 = List_create();
+
+	sub_list1 = List_create();
+	sub_list2 = List_create();
+
+	List_split(list1, sub_list1, 20, sub_list2, 1);
+
+	List_clear_destroy(list1);
+
+	mu_assert(List_count(sub_list1) == 0, "Wrong count on split.");
+	mu_assert(List_count(sub_list2) == 0, "Wrong count on split.");
+
+	List_clear_destroy(sub_list1);
+	List_clear_destroy(sub_list2);
+
 	return NULL;
 }
 

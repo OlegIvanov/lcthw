@@ -238,7 +238,10 @@ int List_split_hidden(List *list, ...)
 		while(sub_list_count == 0) {
 			sub_list = va_arg(argp, List *);
 
+			if(!sub_list) break;
+
 			sub_list_count = va_arg(argp, int);
+
 			check(sub_list_count >= 0, "sub_list_count can't be negative");
 		}
 
