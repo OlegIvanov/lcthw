@@ -177,8 +177,8 @@ error:
 	return NULL;
 }
 
-// Don't forget to pass in NULL for last parameter
-int List_join(List *list, ...)
+// You should use List_join macro.
+int List_join_hidden(List *list, ...)
 {
 	assert(list_start != NULL && "list_start can't be NULL");
 
@@ -216,8 +216,8 @@ int List_join(List *list, ...)
 	return 0;
 }
 
-// Don't forget to pass in NULL for last parameter
-int List_split(List *list, ...)
+// You should use List_split macro.
+int List_split_hidden(List *list, ...)
 {
 	assert(list != NULL && "list can't be NULL");
 

@@ -129,7 +129,7 @@ char *test_join()
 	List_push(list3, test4);
 	List_push(list3, test5);
 
-	List_join(list1, list2, list3, NULL);
+	List_join(list1, list2, list3);
 
 	List_clear_destroy(list2);
 	List_clear_destroy(list3);
@@ -148,7 +148,7 @@ char *test_join()
 
 	List_push(list4, test4);
 
-	List_join(list1, list2, list4, list3, NULL);
+	List_join(list1, list2, list4, list3);
 
 	List_clear_destroy(list2);
 	List_clear_destroy(list3);

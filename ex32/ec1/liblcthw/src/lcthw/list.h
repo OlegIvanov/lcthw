@@ -33,8 +33,11 @@ void *List_shift(List *list);
 void *List_remove(List *list, ListNode *node);
 
 List *List_copy(List *list);
-int List_join(List *list, ...);
-int List_split(List *list, ...);
+int List_join_hidden(List *list, ...);
+int List_split_hidden(List *list, ...);
+
+#define List_join(list, ...) List_join_hidden(list, ##__VA_ARGS__, NULL)
+#define List_split(list, ...) List_split_hidden(list, ##__VA_ARGS__, NULL)
 
 #define LIST_FOREACH(L, S, M, V) ListNode *_node = NULL;\
 	ListNode *V = NULL;\
