@@ -162,7 +162,7 @@ error:
 
 List *List_copy(List *list)
 {
-	assert(list != NULL && "list can't be NULL");
+	check(list, "list can't be NULL");
 	
 	List *list_copy = calloc(1, sizeof(List));
 	check_mem(list_copy);
@@ -180,7 +180,7 @@ error:
 // You should use List_join macro.
 int List_join_hidden(List *list, ...)
 {
-	assert(list_start != NULL && "list_start can't be NULL");
+	check(list, "list_start can't be NULL")
 
 	va_list	argp;
 	va_start(argp, list);
@@ -214,12 +214,15 @@ int List_join_hidden(List *list, ...)
 	va_end(argp);
 
 	return 0;
+
+error:
+	return -1;
 }
 
 // You should use List_split macro.
 int List_split_hidden(List *list, ...)
 {
-	assert(list != NULL && "list can't be NULL");
+	check(list, "list can't be NULL");
 
 	va_list	argp;
 	va_start(argp, list);
@@ -234,6 +237,7 @@ int List_split_hidden(List *list, ...)
 			if(!sub_list) break;
 
 			sub_list_count = va_arg(argp, int);
+
 			check(sub_list_count > 0, "sub_list_count can't be negative");
 		}
 

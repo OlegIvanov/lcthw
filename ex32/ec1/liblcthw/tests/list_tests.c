@@ -115,6 +115,7 @@ char *test_copy()
 
 char *test_join()
 {
+	// first join test
 	List *list1 = List_create();
 
 	List_push(list1, test1);
@@ -139,7 +140,8 @@ char *test_join()
 	mu_assert(List_count(list1) == 5, "Wrong count on join.");
 
 	List_clear_destroy(list1);
-
+	
+	// second join test
 	list1 = List_create();
 	list2 = List_create();
 	list3 = List_create();
@@ -157,6 +159,20 @@ char *test_join()
 	mu_assert(List_first(list1) == test4, "Wrong first value.");
 	mu_assert(List_last(list1) == test4, "Wrong last value.");
 	mu_assert(List_count(list1) == 1, "Wrong count on join.");
+
+	List_clear_destroy(list1);
+
+	// third join test
+	list1 = List_create();
+	list2 = List_create();
+	list3 = List_create();
+	
+	List_join(list1, list2, list3);
+
+	List_clear_destroy(list2);
+	List_clear_destroy(list3);
+
+	mu_assert(List_count(list1) == 0, "Wrong count on join.");
 
 	List_clear_destroy(list1);
 
