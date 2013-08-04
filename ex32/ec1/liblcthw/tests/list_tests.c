@@ -181,6 +181,7 @@ char *test_join()
 
 char *test_split()
 {
+	// first split test
 	List *list1 = List_create();
 
 	List_push(list1, test1);
@@ -208,6 +209,32 @@ char *test_split()
 	mu_assert(List_first(sub_list3) == test4, "Wrong first value.");
 	mu_assert(List_last(sub_list3) == test5, "Wrong last value.");
 	mu_assert(List_count(sub_list3) == 2, "Wrong count on split.");
+
+	List_clear_destroy(sub_list1);
+	List_clear_destroy(sub_list2);
+	List_clear_destroy(sub_list3);
+
+	// second split test
+	list1 = List_create();
+
+	List_push(list1, test1);
+	List_push(list1, test2);
+	List_push(list1, test3);
+
+	sub_list1 = List_create();
+	sub_list2 = List_create();
+	sub_list3 = List_create();
+
+	List_split(list1, sub_list1, 1, sub_list2, 0, sub_list3, 100);
+
+	List_clear_destroy(list1);
+
+	mu_assert(List_count(sub_list1) == 1, "Wrong count on split.");
+	mu_assert(List_count(sub_list2) == 0, "Wrong count on split.");
+	mu_assert(List_count(sub_list3) == 2, "Wrong count on split.");
+
+	mu_assert(List_first(sub_list3) == test2, "Wrong first value.");
+	mu_assert(List_last(sub_list3) == test3, "Wrong last value.");
 
 	List_clear_destroy(sub_list1);
 	List_clear_destroy(sub_list2);

@@ -177,7 +177,9 @@ error:
 	return NULL;
 }
 
-// You should use List_join macro.
+/* 
+ * You should use "List_join" macro.
+*/
 int List_join_hidden(List *list, ...)
 {
 	check(list, "list_start can't be NULL")
@@ -219,7 +221,9 @@ error:
 	return -1;
 }
 
-// You should use List_split macro.
+/*
+ * You should use "List_split" macro.
+*/
 int List_split_hidden(List *list, ...)
 {
 	check(list, "list can't be NULL");
@@ -231,15 +235,14 @@ int List_split_hidden(List *list, ...)
 	List *sub_list = NULL;
 
 	LIST_FOREACH(list, first, next, cur) {
-		if(sub_list_count == 0) {
+		while(sub_list_count == 0) {
 			sub_list = va_arg(argp, List *);
 
-			if(!sub_list) break;
-
 			sub_list_count = va_arg(argp, int);
-
-			check(sub_list_count > 0, "sub_list_count can't be negative");
+			check(sub_list_count >= 0, "sub_list_count can't be negative");
 		}
+
+		if(!sub_list) break;
 
 		List_push(sub_list, cur->value);
 
