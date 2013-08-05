@@ -12,7 +12,7 @@ TARGET=build/liblcthw.a
 SO_TARGET=$(patsubst %.a,%.so,$(TARGET))
 
 # The Target Build
-all: $(TARGET) $(SO_TARGET) tests
+all: $(TARGET) $(SO_TARGET) $(TESTS) tests
 
 dev: CFLAGS=-g -Wall -Isrc -Wall -Wextra $(OPTFLAGS)
 dev: all
@@ -29,10 +29,12 @@ build:
 	@mkdir -p build
 	@mkdir -p bin
 
+$(TESTS): % : %.c
+	$(CC) $(CFLAGS) $< $(TARGET) -o $@
+
 # The Unit Tests
 .PHONY: tests
 tests:
-	$(CC) -g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(TEST_SRC) $(TARGET) -o $(TESTS)
 	sh ./tests/runtests.sh
 
 valgrind:
