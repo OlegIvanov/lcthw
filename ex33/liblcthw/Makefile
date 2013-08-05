@@ -29,7 +29,7 @@ build:
 	@mkdir -p build
 	@mkdir -p bin
 
-$(TESTS): % : %.c
+$(TESTS): %_tests: %_tests.c
 	$(CC) $(CFLAGS) $< $(TARGET) -o $@
 
 # The Unit Tests
@@ -42,7 +42,7 @@ valgrind:
 
 # The Cleaner
 clean:
-	rm -rf build $(OBJECTS) $(TESTS)
+	rm -rf bin build $(OBJECTS) $(TESTS)
 	rm -f tests/tests.log
 	find . -name "*.gc*" -exec rm {} \;
 	rm -rf 'find . -name "*.dSYM" -print'
