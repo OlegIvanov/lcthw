@@ -82,6 +82,11 @@ List *List_merge_sort(List *list, List_compare cmp)
 
 	if(sort_left != left) List_clear_destroy(left);
 	if(sort_right != right) List_clear_destroy(right);
+	
+	List *merged_list = List_merge(sort_left, sort_right, cmp);
 
-	return List_merge(sort_left, sort_right, cmp);
+	List_clear_destroy(sort_left);
+	List_clear_destroy(sort_right);
+
+	return merged_list;
 }

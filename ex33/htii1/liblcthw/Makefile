@@ -29,7 +29,7 @@ build:
 	@mkdir -p build
 	@mkdir -p bin
 
-$(TESTS): %_tests: %_tests.c
+$(TESTS): %_tests: %_tests.c $(TARGET)
 	$(CC) $(CFLAGS) $< $(TARGET) -o $@
 
 # The Unit Tests
