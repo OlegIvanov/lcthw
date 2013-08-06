@@ -7,7 +7,7 @@
 /*
  * You should use "check_sorting" macro.
 */
-int check_sorting_hidden(List *list)
+int is_sorted(List *list)
 {
 	assert(list != NULL && "list can't be NULL");
 
