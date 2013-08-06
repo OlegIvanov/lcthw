@@ -6,8 +6,8 @@
 
 char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro", "experiments", "very", "much"};
 #define NUM_VALUES 11
-#define BILLION 1E9
-#define SORT_ITERATIONS 10000
+#define BUBBLE_SORT_ITERATIONS 10000
+#define MERGE_SORT_ITERATIONS 1
 
 List *create_words()
 {
@@ -71,32 +71,65 @@ char *compare_perfomance()
 {
 	struct timespec start, end;
 	double diff;
+
 	int i = 0;
-	List *words = NULL;
+
+	List *bubble_words[BUBBLE_SORT_ITERATIONS];
+	int rc[BUBBLE_SORT_ITERATIONS];
+	/*
+	List *merge_words = NULL;
+	List *merged_words[MERGE_SORT_ITERATIONS];
+	*/
+	// bubble sort bootstrap
+	for(i = 0; i < BUBBLE_SORT_ITERATIONS; i++) {
+		bubble_words[i] = create_words();
+	}
+
+	// bubble sort measuring
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+
+	for(i = 0; i < BUBBLE_SORT_ITERATIONS; i++) {
+		rc[i] = List_bubble_sort(bubble_words[i], (List_compare)strcmp);
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+
+	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BUBBLE_SORT_ITERATIONS;
+	printf("\nBubble sort took %lf nanoseconds to run.\n\n", diff);
+
+	// bubble sort checking results and freeing of resources
+	for(i = 0; i < BUBBLE_SORT_ITERATIONS; i++) {
+		mu_assert(rc[i] == 0, "Bubble sort failed.");
+		mu_assert(check_sorting(bubble_words[i], (List_compare)strcmp), "Words are not sorted after merge sort.");
+		List_clear_destroy(bubble_words[i]);
+	}
+
+	// merge sort bootstrap
+	/*
+	merge_words = create_words();
+	*/
 	
-	// bubble sort
+	// merge sort measuring
+	/*
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
-	for(i = 0; i < SORT_ITERATIONS; i++) {
-		words = create_words();
-		List_bubble_sort(words, (List_compare)strcmp);
-		List_clear_destroy(words);
+
+	for(i = 0; i < MERGE_SORT_ITERATIONS; i++) {
+		merged_words[i] = List_merge_sort(merge_words, (List_compare)strcmp);
 	}
+
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
-	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
-	printf("\nBubble sort took %lf seconds.\n\n", diff);
-
-	// merge sort
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
-	for(i = 0; i < SORT_ITERATIONS; i++) {
-		words = create_words();
-		List_merge_sort(words, (List_compare)strcmp);
-		List_clear_destroy(words);
+	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / MERGE_SORT_ITERATIONS;
+	printf("Merge sort took %lf nanoseconds to run.\n\n", diff);
+	*/
+	// merge sort checking results and freeing of resources
+	/*
+	List_clear_destroy(merge_words);
+	for(i = 0; i < MERGE_SORT_ITERATIONS; i++) {
+		mu_assert(check_sorting(merged_words[i], (List_compare)strcmp), "Words are not sorted after merge sort.");
+		List_clear_destroy(merged_words[i]);
 	}
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
-
-	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
-	printf("Merge sort took %lf seconds.\n\n", diff);
+	*/
 
 	return NULL;
 }
