@@ -75,6 +75,25 @@ char *test_merge_sort()
 	return NULL;
 }
 
+char *test_insert_sort()
+{
+	List *words = create_words();
+
+	// should work on a list that needs sorting
+	List *res = List_insert_sorted(words, (List_compare)strcmp);
+	mu_assert(check_sorting(res, (List_compare)strcmp), "Words are not sorted after insert sort.");
+
+	List *res2 = List_insert_sorted(res, (List_compare)strcmp);
+	mu_assert(check_sorting(res, (List_compare)strcmp), "Should still be sorted after insert sort.");
+
+	if(res2 != res) List_clear_destroy(res2);
+	if(res != words) List_clear_destroy(res);
+
+	List_clear_destroy(words);
+
+	return NULL;
+}
+
 char *compare_perfomance()
 {
 	struct timespec start, end;
@@ -143,6 +162,7 @@ char *all_tests()
 	
 	mu_run_test(test_bubble_sort);
 	mu_run_test(test_merge_sort);
+	mu_run_test(test_insert_sort);
 
 	mu_run_test(compare_perfomance);
 

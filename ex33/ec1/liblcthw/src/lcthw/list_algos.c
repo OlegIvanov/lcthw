@@ -122,3 +122,49 @@ List *List_merge_sort(List *list, List_compare cmp)
 
 	return merged_list;
 }
+
+List *List_insert_sorted(List *list, List_compare cmp)
+{
+	assert(list != NULL && "list can't be NULL");
+	assert(cmp != NULL && "cmp can't be NULL");
+
+	if(List_count(list) <= 1) {
+		return list;
+	}
+
+	List *sorted_list = List_create();
+		
+	LIST_FOREACH(list, first, next, cur) {
+		ListNode *cur_node = NULL;
+		ListNode *insert_before_node = NULL;
+
+		for(cur_node = sorted_list->first;
+			cur_node != NULL;
+			cur_node = cur_node->next) {
+
+			if(cmp(cur->value, cur_node->value) <= 0) {
+				insert_before_node = cur_node;
+				break;
+			}
+		}
+
+		if(insert_before_node == NULL) {
+			List_push(sorted_list, cur->value);
+		} else if(insert_before_node->prev == NULL) {
+			List_unshift(sorted_list, cur->value);
+		} else {
+			ListNode *new_node = calloc(1, sizeof(ListNode));
+
+			new_node->value = cur->value;
+			new_node->next = insert_before_node;
+			new_node->prev = insert_before_node->prev;
+
+			insert_before_node->prev->next = new_node;
+			insert_before_node->prev = new_node;
+
+			sorted_list->count++;
+		}
+	}
+
+	return sorted_list;
+}
