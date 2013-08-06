@@ -61,8 +61,6 @@ char *test_merge_sort()
 
 	List_clear_destroy(words);
 
-	//check_sorting(NULL, (List_compare)strcmp);
-
 	return NULL;
 }
 
