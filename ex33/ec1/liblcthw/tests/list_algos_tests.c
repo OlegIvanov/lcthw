@@ -9,8 +9,8 @@ char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro",
 
 #define BILLION 1000000000UL
 
-#define BUBBLE_SORT_ITERATIONS 100000
-#define MERGE_SORT_ITERATIONS 100
+#define BUBBLE_SORT_ITERATIONS 1000000
+#define MERGE_SORT_ITERATIONS 10000
 
 List *create_words()
 {
