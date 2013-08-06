@@ -1,6 +1,8 @@
 #include <lcthw/list_algos.h>
 #include <lcthw/dbg.h>
 
+#define SUB_LIST_MIN_SIZE 2
+
 inline void ListNode_swap(ListNode *a, ListNode *b)
 {
 	void *temp = a->value;
@@ -43,14 +45,11 @@ inline List *List_merge(List *left, List *right, List_compare cmp)
 			} else {
 				val = List_shift(right);
 			}
-
 			List_push(result, val);
 		} else if(List_count(left) > 0) {
-			val = List_shift(left);
-			List_push(result, val);
+			List_join(result, left);
 		} else if(List_count(right) > 0) {
-			val = List_shift(right);
-			List_push(result, val);
+			List_join(result, right);
 		}
 	}
 
@@ -59,7 +58,8 @@ inline List *List_merge(List *left, List *right, List_compare cmp)
 
 List *List_merge_sort(List *list, List_compare cmp)
 {
-	if(List_count(list) <= 1) {
+	if(List_count(list) <= SUB_LIST_MIN_SIZE) {
+		List_bubble_sort(list, cmp);
 		return list;
 	}
 
@@ -67,15 +67,7 @@ List *List_merge_sort(List *list, List_compare cmp)
 	List *right = List_create();
 	int middle = List_count(list) / 2;
 
-	LIST_FOREACH(list, first, next, cur) {
-		if(middle > 0) {
-			List_push(left, cur->value);
-		} else {
-			List_push(right, cur->value);
-		}
-
-		middle--;
-	}
+	List_split(list, left, middle, right, List_count(list) - middle);
 
 	List *sort_left = List_merge_sort(left, cmp);
 	List *sort_right = List_merge_sort(right, cmp);

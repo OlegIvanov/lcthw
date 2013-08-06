@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS"};
+char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro", "experiments", "very", "much"};
 #define NUM_VALUES 5
 
 List *create_words()
