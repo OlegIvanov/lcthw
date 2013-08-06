@@ -1,7 +1,26 @@
 #include <lcthw/list_algos.h>
 #include <lcthw/dbg.h>
+#include <assert.h>
 
 #define SUB_LIST_MIN_SIZE 3
+
+/*
+ * You should use "check_sorting" macro.
+*/
+int check_sorting_hidden(List *list)
+{
+	assert(list != NULL && "list can't be NULL");
+
+	LIST_FOREACH(list, first, next, cur) {
+		if(cur->next && strcmp(cur->value, cur->next->value) > 0) {
+			debug("%s %s", (char *)cur->value, (char *)cur->next->value);
+
+			return 0;
+		}
+	}
+
+	return 1;
+}
 
 inline void ListNode_swap(ListNode *a, ListNode *b)
 {
@@ -12,11 +31,14 @@ inline void ListNode_swap(ListNode *a, ListNode *b)
 
 int List_bubble_sort(List *list, List_compare cmp)
 {
-	if(List_count(list) <= 1) {
-		return 0; // already sorted
-	}
+	assert(list != NULL && "list can't be NULL");
+	assert(cmp != NULL && "cmp can't be NULL");
 
 	int n = List_count(list);
+
+	if(n <= 1) {
+		return 0; // already sorted
+	}
 
 	do {
 		int j = 0;
@@ -66,9 +88,13 @@ inline List *List_merge(List *left, List *right, List_compare cmp)
 
 List *List_merge_sort(List *list, List_compare cmp)
 {
+	assert(list != NULL && "list can't be NULL");
+	assert(cmp != NULL && "cmp can't be NULL");
+
 	if(List_count(list) <= SUB_LIST_MIN_SIZE) {
 		int rc = List_bubble_sort(list, cmp);
-		check(rc == 0, "Bubble sort failed.");
+
+		assert(rc == 0 && "Bubble sort failed.");
 
 		return list;
 	}
@@ -92,7 +118,4 @@ List *List_merge_sort(List *list, List_compare cmp)
 	List_clear_destroy(sort_right);
 
 	return merged_list;
-
-error:
-	return NULL;
 }
