@@ -1,7 +1,7 @@
 #include <lcthw/list_algos.h>
 #include <lcthw/dbg.h>
 
-#define SUB_LIST_MIN_SIZE 2
+#define SUB_LIST_MIN_SIZE 3
 
 inline void ListNode_swap(ListNode *a, ListNode *b)
 {
@@ -59,12 +59,15 @@ inline List *List_merge(List *left, List *right, List_compare cmp)
 List *List_merge_sort(List *list, List_compare cmp)
 {
 	if(List_count(list) <= SUB_LIST_MIN_SIZE) {
-		List_bubble_sort(list, cmp);
+		int rc = List_bubble_sort(list, cmp);
+		check(rc == 0, "Bubble sort failed.");
+
 		return list;
 	}
 
 	List *left = List_create();
 	List *right = List_create();
+
 	int middle = List_count(list) / 2;
 
 	List_split(list, left, middle, right, List_count(list) - middle);
@@ -81,4 +84,7 @@ List *List_merge_sort(List *list, List_compare cmp)
 	List_clear_destroy(sort_right);
 
 	return merged_list;
+
+error:
+	return NULL;
 }

@@ -4,7 +4,7 @@
 #include <string.h>
 
 char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro", "experiments", "very", "much"};
-#define NUM_VALUES 5
+#define NUM_VALUES 11
 
 List *create_words()
 {
@@ -67,10 +67,12 @@ char *test_merge_sort()
 
 	List *res2 = List_merge_sort(res, (List_compare)strcmp);
 	mu_assert(is_sorted(res), "Should still be sorted after merge sort.");
-	List_clear_destroy(res2);
-	List_clear_destroy(res);
+
+	if(res2 != res) List_clear_destroy(res2);
+	if(res != words) List_clear_destroy(res);
 
 	List_clear_destroy(words);
+
 	return NULL;
 }
 
