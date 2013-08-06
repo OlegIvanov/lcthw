@@ -108,7 +108,7 @@ char *compare_perfomance()
 	// bubble sort checking results and freeing of resources
 	for(i = 0; i < BUBBLE_SORT_ITERATIONS; i++) {
 		mu_assert(rc[i] == 0, "Bubble sort failed.");
-		mu_assert(check_sorting(bubble_words[i], (List_compare)strcmp), "Words are not sorted after merge sort.");
+		mu_assert(check_sorting(bubble_words[i], (List_compare)strcmp), "Words are not sorted after bubble sort.");
 		List_clear_destroy(bubble_words[i]);
 	}
 
