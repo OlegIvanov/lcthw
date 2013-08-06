@@ -6,8 +6,11 @@
 
 char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro", "experiments", "very", "much"};
 #define NUM_VALUES 11
-#define BUBBLE_SORT_ITERATIONS 10000
-#define MERGE_SORT_ITERATIONS 1
+
+#define BILLION 1000000000UL
+
+#define BUBBLE_SORT_ITERATIONS 100000
+#define MERGE_SORT_ITERATIONS 100
 
 List *create_words()
 {
@@ -19,6 +22,11 @@ List *create_words()
 	}
 
 	return words;
+}
+
+long get_diff(struct timespec start, struct timespec end)
+{
+	return (unsigned long)(end.tv_sec - start.tv_sec) * BILLION + (unsigned long)(end.tv_nsec - start.tv_nsec);
 }
 
 char *test_bubble_sort()
@@ -76,10 +84,10 @@ char *compare_perfomance()
 
 	List *bubble_words[BUBBLE_SORT_ITERATIONS];
 	int rc[BUBBLE_SORT_ITERATIONS];
-	/*
+
 	List *merge_words = NULL;
 	List *merged_words[MERGE_SORT_ITERATIONS];
-	*/
+
 	// bubble sort bootstrap
 	for(i = 0; i < BUBBLE_SORT_ITERATIONS; i++) {
 		bubble_words[i] = create_words();
@@ -94,7 +102,7 @@ char *compare_perfomance()
 
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
-	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BUBBLE_SORT_ITERATIONS;
+	diff = (double)get_diff(start, end) / BUBBLE_SORT_ITERATIONS;
 	printf("\nBubble sort took %lf nanoseconds to run.\n\n", diff);
 
 	// bubble sort checking results and freeing of resources
@@ -105,12 +113,9 @@ char *compare_perfomance()
 	}
 
 	// merge sort bootstrap
-	/*
 	merge_words = create_words();
-	*/
 	
 	// merge sort measuring
-	/*
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 
 	for(i = 0; i < MERGE_SORT_ITERATIONS; i++) {
@@ -119,17 +124,15 @@ char *compare_perfomance()
 
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
-	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / MERGE_SORT_ITERATIONS;
+	diff = (double)get_diff(start, end) / MERGE_SORT_ITERATIONS;
 	printf("Merge sort took %lf nanoseconds to run.\n\n", diff);
-	*/
+
 	// merge sort checking results and freeing of resources
-	/*
 	List_clear_destroy(merge_words);
 	for(i = 0; i < MERGE_SORT_ITERATIONS; i++) {
 		mu_assert(check_sorting(merged_words[i], (List_compare)strcmp), "Words are not sorted after merge sort.");
 		List_clear_destroy(merged_words[i]);
 	}
-	*/
 
 	return NULL;
 }
