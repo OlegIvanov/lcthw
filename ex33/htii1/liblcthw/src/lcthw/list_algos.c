@@ -12,8 +12,6 @@ inline void ListNode_swap(ListNode *a, ListNode *b)
 
 int List_bubble_sort(List *list, List_compare cmp)
 {
-	int sorted = 1;
-
 	if(List_count(list) <= 1) {
 		return 0; // already sorted
 	}
@@ -22,21 +20,23 @@ int List_bubble_sort(List *list, List_compare cmp)
 
 	do {
 		int j = 0;
-		sorted = 1;
+		int new_n = 0;
 
 		LIST_FOREACH(list, first, next, cur) {
 			if(j == n - 1) break;
 		
 			if(cmp(cur->value, cur->next->value) > 0) {
 				ListNode_swap(cur, cur->next);
-				sorted = 0;
+
+				new_n = j + 1;
 			}
 
 			j++;
 		}
 
-		n--;
-	} while(!sorted);
+		n = new_n;
+
+	} while(n != 0);
 
 	return 0;
 }
