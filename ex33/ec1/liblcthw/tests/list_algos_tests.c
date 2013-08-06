@@ -2,9 +2,12 @@
 #include <lcthw/list_algos.h>
 #include <assert.h>
 #include <string.h>
+#include <time.h>
 
 char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro", "experiments", "very", "much"};
 #define NUM_VALUES 11
+#define BILLION 1E9
+#define SORT_ITERATIONS 10000
 
 List *create_words()
 {
@@ -64,12 +67,48 @@ char *test_merge_sort()
 	return NULL;
 }
 
+char *compare_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	int i = 0;
+	List *words = NULL;
+	
+	// bubble sort
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+	for(i = 0; i < SORT_ITERATIONS; i++) {
+		words = create_words();
+		List_bubble_sort(words, (List_compare)strcmp);
+		List_clear_destroy(words);
+	}
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+
+	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
+	printf("\nBubble sort took %lf seconds.\n\n", diff);
+
+	// merge sort
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+	for(i = 0; i < SORT_ITERATIONS; i++) {
+		words = create_words();
+		List_merge_sort(words, (List_compare)strcmp);
+		List_clear_destroy(words);
+	}
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+
+	diff = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec ) / BILLION;
+	printf("Merge sort took %lf seconds.\n\n", diff);
+
+	return NULL;
+}
+
 char *all_tests()
 {
 	mu_suite_start();
 	
 	mu_run_test(test_bubble_sort);
 	mu_run_test(test_merge_sort);
+
+	mu_run_test(compare_perfomance);
 
 	return NULL;
 }
