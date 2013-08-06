@@ -9,13 +9,13 @@ int List_bubble_sort(List *list, List_compare cmp);
 
 List *List_merge_sort(List *list, List_compare cmp);
 
-int is_sorted(List *list);
+int is_sorted(List *list, List_compare cmp);
 
 #ifdef NDEBUG
-#define check_sorting(list)
+#define check_sorting(list, cmp)
 #else
-#define check_sorting(list) \
-	is_sorted(list)
+#define check_sorting(list, cmp) \
+	is_sorted(list, cmp)
 #endif
 
 #endif

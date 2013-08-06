@@ -7,12 +7,12 @@
 /*
  * You should use "check_sorting" macro.
 */
-int is_sorted(List *list)
+int is_sorted(List *list, List_compare cmp)
 {
 	assert(list != NULL && "list can't be NULL");
 
 	LIST_FOREACH(list, first, next, cur) {
-		if(cur->next && strcmp(cur->value, cur->next->value) > 0) {
+		if(cur->next && cmp(cur->value, cur->next->value) > 0) {
 			debug("%s %s", (char *)cur->value, (char *)cur->next->value);
 
 			return 0;
@@ -24,6 +24,9 @@ int is_sorted(List *list)
 
 inline void ListNode_swap(ListNode *a, ListNode *b)
 {
+	assert(a != NULL && "a can't be NULL");
+	assert(b != NULL && "b can't be NULL");
+
 	void *temp = a->value;
 	a->value = b->value;
 	b->value = temp;
