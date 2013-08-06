@@ -12,10 +12,9 @@ List *List_merge_sort(List *list, List_compare cmp);
 int is_sorted(List *list, List_compare cmp);
 
 #ifdef NDEBUG
-#define check_sorting(list, cmp)
+#define check_sorting(list, cmp) NULL
 #else
-#define check_sorting(list, cmp) \
-	is_sorted(list, cmp)
+#define check_sorting(list, cmp) is_sorted(list, cmp)
 #endif
 
 #endif
