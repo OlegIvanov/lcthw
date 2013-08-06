@@ -18,16 +18,24 @@ int List_bubble_sort(List *list, List_compare cmp)
 		return 0; // already sorted
 	}
 
+	int n = List_count(list);
+
 	do {
+		int j = 0;
 		sorted = 1;
+
 		LIST_FOREACH(list, first, next, cur) {
-			if(cur->next) {
-				if(cmp(cur->value, cur->next->value) > 0) {
-					ListNode_swap(cur, cur->next);
-					sorted = 0;
-				}
+			if(j == n - 1) break;
+		
+			if(cmp(cur->value, cur->next->value) > 0) {
+				ListNode_swap(cur, cur->next);
+				sorted = 0;
 			}
+
+			j++;
 		}
+
+		n--;
 	} while(!sorted);
 
 	return 0;
