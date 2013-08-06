@@ -211,6 +211,7 @@ int List_join_hidden(List *list, ...)
 		// preparing for succesfull destruction
 		sub_list->first = NULL;
 		sub_list->last = NULL;
+		sub_list->count = 0;
 	}
 
 	va_end(argp);
