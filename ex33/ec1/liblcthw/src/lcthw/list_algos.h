@@ -9,6 +9,8 @@ int List_bubble_sort(List *list, List_compare cmp);
 
 List *List_merge_sort(List *list, List_compare cmp);
 
+List *List_insert_sorted(List *list, List_compare cmp);
+
 int is_sorted(List *list, List_compare cmp);
 
 #ifdef NDEBUG
