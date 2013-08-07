@@ -207,13 +207,21 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 			merged_list = List_merge(left_list, right_list, cmp);
 
 			List_join(sorted_list, merged_list);
+			/*
+			List_clear_destroy(dropped_list);
+			List_clear_destroy(left_list);
+			List_clear_destroy(right_list);
+			List_clear_destroy(merged_list);
+			*/
 		}
 
 		if(list_size % (2 * run_size) == 1) {
 	
 			List_push(sorted_list, list_copy->last->value);
 		}
-
+		/*
+		List_clear_destroy(list_copy);
+		*/
 		list_copy = sorted_list;
 	}
 

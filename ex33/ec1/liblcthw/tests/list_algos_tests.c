@@ -5,8 +5,8 @@
 #include <time.h>
 #include <sys/resource.h>
 
-char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro", "experiments", "very", "much"};
-#define NUM_VALUES 11
+char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro", "experiments"};
+#define NUM_VALUES 9
 
 #define SUBLIST_MIN_SIZE 1
 
@@ -291,7 +291,7 @@ char *test_bottom_up_perfomance()
 char *all_tests()
 {
 	mu_suite_start();
-	
+
 	mu_run_test(test_bubble_sort);
 	mu_run_test(test_merge_sort);
 	mu_run_test(test_insert_sort);
