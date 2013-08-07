@@ -2,8 +2,6 @@
 #include <lcthw/dbg.h>
 #include <assert.h>
 
-#define SUB_LIST_MIN_SIZE 3
-
 /*
  * You should use "check_sorting" macro.
 */
@@ -89,12 +87,12 @@ inline List *List_merge(List *left, List *right, List_compare cmp)
 	return result;
 }
 
-List *List_merge_sort(List *list, List_compare cmp)
+List *List_merge_sort(List *list, List_compare cmp, int sublist_min_size)
 {
 	assert(list != NULL && "list can't be NULL");
 	assert(cmp != NULL && "cmp can't be NULL");
 
-	if(List_count(list) <= SUB_LIST_MIN_SIZE) {
+	if(List_count(list) <= sublist_min_size) {
 		int rc = List_bubble_sort(list, cmp);
 
 		assert(rc == 0 && "Bubble sort failed.");
@@ -109,8 +107,8 @@ List *List_merge_sort(List *list, List_compare cmp)
 
 	List_split(list, left, middle, right, List_count(list) - middle);
 
-	List *sort_left = List_merge_sort(left, cmp);
-	List *sort_right = List_merge_sort(right, cmp);
+	List *sort_left = List_merge_sort(left, cmp, sublist_min_size);
+	List *sort_right = List_merge_sort(right, cmp, sublist_min_size);
 	/*
 	if(sort_left != left) List_clear_destroy(left);
 	if(sort_right != right) List_clear_destroy(right);

@@ -8,6 +8,8 @@
 char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro", "experiments", "very", "much"};
 #define NUM_VALUES 11
 
+#define SUBLIST_MIN_SIZE 1
+
 #define BILLION 1000000000UL
 
 #define ITER 1000000L
@@ -27,6 +29,26 @@ List *create_words()
 long get_diff(struct timespec start, struct timespec end)
 {
 	return (unsigned long)(end.tv_sec - start.tv_sec) * BILLION + (unsigned long)(end.tv_nsec - start.tv_nsec);
+}
+
+void stack_increase()
+{
+	const rlim_t kStackSize = 128L * 1024L * 1024L;
+	struct rlimit rl;
+	int result;
+
+	result = getrlimit(RLIMIT_STACK, &rl);
+	if(result == 0) {
+		if(rl.rlim_cur < kStackSize) {	
+			rl.rlim_cur = kStackSize;
+
+			result = setrlimit(RLIMIT_STACK, &rl);
+
+            if(result != 0) {
+                fprintf(stderr, "setrlimit returned result = %d\n", result);
+			}
+		}
+	}
 }
 
 char *test_bubble_sort()
@@ -61,10 +83,10 @@ char *test_merge_sort()
 	List *words = create_words();
 
 	// should work on a list that needs sorting
-	List *res = List_merge_sort(words, (List_compare)strcmp);
+	List *res = List_merge_sort(words, (List_compare)strcmp, SUBLIST_MIN_SIZE);
 	mu_assert(check_sorting(res, (List_compare)strcmp), "Words are not sorted after merge sort.");
 
-	List *res2 = List_merge_sort(res, (List_compare)strcmp);
+	List *res2 = List_merge_sort(res, (List_compare)strcmp, SUBLIST_MIN_SIZE);
 	mu_assert(check_sorting(res, (List_compare)strcmp), "Should still be sorted after merge sort.");
 
 	if(res2 != res) List_clear_destroy(res2);
@@ -149,7 +171,7 @@ char *test_merge_perfomance()
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 
 	for(i = 0; i < ITER; i++) {
-		merged_words[i] = List_merge_sort(merge_words, (List_compare)strcmp);
+		merged_words[i] = List_merge_sort(merge_words, (List_compare)strcmp, SUBLIST_MIN_SIZE);
 	}
 
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
@@ -216,22 +238,7 @@ char *all_tests()
 	mu_run_test(test_merge_sort);
 	mu_run_test(test_insert_sort);
 
-	const rlim_t kStackSize = 128L * 1024L * 1024L;
-	struct rlimit rl;
-	int result;
-
-	result = getrlimit(RLIMIT_STACK, &rl);
-	if(result == 0) {
-		if(rl.rlim_cur < kStackSize) {	
-			rl.rlim_cur = kStackSize;
-
-			result = setrlimit(RLIMIT_STACK, &rl);
-
-            if(result != 0) {
-                fprintf(stderr, "setrlimit returned result = %d\n", result);
-			}
-		}
-	}
+	stack_increase();
 
 	mu_run_test(test_bubble_perfomance);
 	mu_run_test(test_merge_perfomance);
