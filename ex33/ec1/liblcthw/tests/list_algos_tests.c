@@ -11,6 +11,7 @@ char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS", "I", "like", "kopro",
 
 #define BUBBLE_SORT_ITERATIONS 1000000
 #define MERGE_SORT_ITERATIONS 10000
+#define INSERT_SORT_ITERATIONS 10000
 
 List *create_words()
 {
@@ -94,7 +95,7 @@ char *test_insert_sort()
 	return NULL;
 }
 
-char *compare_perfomance()
+char *get_bubble_perfomance()
 {
 	struct timespec start, end;
 	double diff;
@@ -103,9 +104,6 @@ char *compare_perfomance()
 
 	List *bubble_words[BUBBLE_SORT_ITERATIONS];
 	int rc[BUBBLE_SORT_ITERATIONS];
-
-	List *merge_words = NULL;
-	List *merged_words[MERGE_SORT_ITERATIONS];
 
 	// bubble sort bootstrap
 	for(i = 0; i < BUBBLE_SORT_ITERATIONS; i++) {
@@ -130,6 +128,19 @@ char *compare_perfomance()
 		mu_assert(check_sorting(bubble_words[i], (List_compare)strcmp), "Words are not sorted after bubble sort.");
 		List_clear_destroy(bubble_words[i]);
 	}
+
+	return NULL;
+}
+
+char *get_merge_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+
+	int i = 0;
+
+	List *merge_words = NULL;
+	List *merged_words[MERGE_SORT_ITERATIONS];
 
 	// merge sort bootstrap
 	merge_words = create_words();
@@ -156,6 +167,43 @@ char *compare_perfomance()
 	return NULL;
 }
 
+char *get_insert_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+
+	int i = 0;
+
+	List *insert_words[INSERT_SORT_ITERATIONS];
+	List *insert_sorted_words[INSERT_SORT_ITERATIONS];
+
+	// insert sort bootstrap
+	for(i = 0; i < INSERT_SORT_ITERATIONS; i++) {
+		insert_words[i] = create_words();
+	}
+
+	// insert sort measuring
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+
+	for(i = 0; i < INSERT_SORT_ITERATIONS; i++) {
+		insert_sorted_words[i] = List_insert_sorted(insert_words[i], (List_compare)strcmp);
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+
+	diff = (double)get_diff(start, end) / INSERT_SORT_ITERATIONS;
+	printf("\nInsert sort took %lf nanoseconds to run.\n\n", diff);
+
+	// insert sort checking results and freeing of resources
+	for(i = 0; i < INSERT_SORT_ITERATIONS; i++) {
+		mu_assert(check_sorting(insert_sorted_words[i], (List_compare)strcmp), "Words are not sorted after insert sort.");
+		List_clear_destroy(insert_sorted_words[i]);
+		List_clear_destroy(insert_words[i]);
+	}
+
+	return NULL;
+}
+
 char *all_tests()
 {
 	mu_suite_start();
@@ -164,7 +212,9 @@ char *all_tests()
 	mu_run_test(test_merge_sort);
 	mu_run_test(test_insert_sort);
 
-	mu_run_test(compare_perfomance);
+	mu_run_test(get_bubble_perfomance);
+	mu_run_test(get_merge_perfomance);
+	mu_run_test(get_insert_perfomance);
 
 	return NULL;
 }
