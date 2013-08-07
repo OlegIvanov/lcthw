@@ -33,7 +33,7 @@ long get_diff(struct timespec start, struct timespec end)
 
 void stack_increase()
 {
-	const rlim_t kStackSize = 128L * 1024L * 1024L;
+	const rlim_t kStackSize = 256L * 1024L * 1024L;
 	struct rlimit rl;
 	int result;
 
@@ -160,7 +160,7 @@ char *test_bubble_perfomance()
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
 	diff = (double)get_diff(start, end) / ITER;
-	printf("\nBubble sort took %lf nanoseconds to run.\n\n", diff);
+	printf("\nBubble sort took %lf nanoseconds to run.\n", diff);
 
 	// bubble sort checking results and freeing of resources
 	/*
@@ -196,7 +196,7 @@ char *test_merge_perfomance()
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
 	diff = (double)get_diff(start, end) / ITER;
-	printf("Merge sort took %lf nanoseconds to run.\n", diff);
+	printf("\nMerge sort took %lf nanoseconds to run.\n", diff);
 
 	// merge sort checking results and freeing of resources
 	/*
@@ -235,7 +235,7 @@ char *test_insert_perfomance()
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
 
 	diff = (double)get_diff(start, end) / ITER;
-	printf("\nInsert sort took %lf nanoseconds to run.\n\n", diff);
+	printf("\nInsert sort took %lf nanoseconds to run.\n", diff);
 
 	// insert sort checking results and freeing of resources
 	/*
@@ -243,6 +243,45 @@ char *test_insert_perfomance()
 		mu_assert(check_sorting(insert_sorted_words[i], (List_compare)strcmp), "Words are not sorted after insert sort.");
 		List_clear_destroy(insert_sorted_words[i]);
 		List_clear_destroy(insert_words[i]);
+	}
+	*/
+
+	return NULL;
+}
+
+char *test_bottom_up_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+
+	int i = 0;
+
+	List *bottom_up_words[ITER];
+	List *bottom_up_sorted_words[ITER];
+
+	// bottom up sort bootstrap
+	for(i = 0; i < ITER; i++) {
+		bottom_up_words[i] = create_words();
+	}
+
+	// bottom up sort measuring
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+
+	for(i = 0; i < ITER; i++) {
+		bottom_up_sorted_words[i] = List_bottom_up_sort(bottom_up_words[i], (List_compare)strcmp);
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+
+	diff = (double)get_diff(start, end) / ITER;
+	printf("\nBottom up sort took %lf nanoseconds to run.\n", diff);
+
+	// bottom up sort checking results and freeing of resources
+	/*
+	for(i = 0; i < ITER; i++) {
+		mu_assert(check_sorting(bottom_up_sorted_words[i], (List_compare)strcmp), "Words are not sorted after bottom up sort.");
+		List_clear_destroy(bottom_up_sorted_words[i]);
+		List_clear_destroy(bottom_up_words[i]);
 	}
 	*/
 
@@ -263,6 +302,7 @@ char *all_tests()
 	mu_run_test(test_bubble_perfomance);
 	mu_run_test(test_merge_perfomance);
 	mu_run_test(test_insert_perfomance);
+	mu_run_test(test_bottom_up_perfomance);
 
 	return NULL;
 }

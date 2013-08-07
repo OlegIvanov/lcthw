@@ -177,9 +177,11 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 	if(List_count(list) <= 1) {
 		return list;
 	}
+	
+	List *list_copy = List_copy(list);
 
 	int run_size = 0;
-	int list_size = List_count(list);
+	int list_size = List_count(list_copy);
 
 	List *sorted_list = NULL;
 
@@ -200,7 +202,7 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 			left_list = List_create();
 			right_list = List_create();
 
-			List_split(list, dropped_list, i * (2 * run_size), left_list, run_size, right_list, run_size);
+			List_split(list_copy, dropped_list, i * (2 * run_size), left_list, run_size, right_list, run_size);
 				
 			merged_list = List_merge(left_list, right_list, cmp);
 
@@ -209,10 +211,10 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 
 		if(list_size % (2 * run_size) == 1) {
 	
-			List_push(sorted_list, list->last->value);
+			List_push(sorted_list, list_copy->last->value);
 		}
 
-		list = sorted_list;
+		list_copy = sorted_list;
 	}
 
 	return sorted_list;
