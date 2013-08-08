@@ -178,65 +178,47 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 		return list;
 	}
 	
-	List *list_copy = List_copy(list);
+	List *copy = List_copy(list);
 
 	int run_size = 0;
-	int list_size = List_count(list_copy);
+	int list_size = List_count(copy);
 
-	List *sorted_list = NULL;
-
-	List *dropped_list = NULL;
-	List *left_list = NULL;
-	List *right_list = NULL;
-	List *merged_list = NULL;
+	List *sorted = NULL, *left = NULL, *right = NULL, *merged = NULL;
 
 	int i = 0;
 
 	for(run_size = 1; run_size < list_size; run_size *= 2) {
-		sorted_list = List_create();
+		sorted = List_create();
+		
+		left = List_create();
+		right = List_create();		
+		
+		i = 0;
 
-		// if not last step
-		if(2 * run_size < list_size) {
-			for(i = 0; i < list_size / (2 * run_size); i++) {
-				dropped_list = List_create();
-				left_list = List_create();
-				right_list = List_create();
+		LIST_FOREACH(copy, first, next, cur) {
+			i++;
 
-				List_split(list_copy, dropped_list, i * (2 * run_size), left_list, run_size, right_list, run_size);
-				merged_list = List_merge(left_list, right_list, cmp);
-				List_join(sorted_list, merged_list);
-
-				/*
-				List_clear_destroy(dropped_list);
-				List_clear_destroy(left_list);
-				List_clear_destroy(right_list);
-				List_clear_destroy(merged_list);
-				*/
+			if(i <= run_size) {
+				List_push(left, cur->value);
+			} else if(i > run_size && i <= 2 * run_size) {
+				List_push(right, cur->value);
 			}
-			list_copy = sorted_list;
-		// last step
-		} else {			
-			if(list_size % 2 == 1) {
-				List_push(list_copy, list->last->value);
-			}			
 
-			left_list = List_create();
-			right_list = List_create();
+			if(i == 2 * run_size || (cur == copy->last && i > run_size && i <= 2 * run_size)) {
+				merged = List_merge(left, right, cmp);
+				List_join(sorted, merged);
 
-			List_split(list_copy, left_list, run_size, right_list, run_size);
-			merged_list = List_merge(left_list, right_list, cmp);
-			List_join(sorted_list, merged_list);
-			
-			/*
-			List_clear_destroy(left_list);
-			List_clear_destroy(right_list);
-			List_clear_destroy(merged_list);
-			*/
+				left = List_create();
+				right = List_create();
+
+				i = 0;
+			} else if(cur == copy->last) {
+				List_join(sorted, left);
+			}
 		}
-		/*
-		List_clear_destroy(list_copy);
-		*/
+
+		copy = sorted;
 	}
 
-	return sorted_list;
+	return sorted;
 }
