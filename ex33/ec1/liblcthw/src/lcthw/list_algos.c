@@ -207,22 +207,28 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 			if(i == 2 * run_size || (cur == copy->last && i > run_size && i <= 2 * run_size)) {
 				merged = List_merge(left, right, cmp);
 				List_join(sorted, merged);
-
+				/*
 				List_clear_destroy(left);
 				List_clear_destroy(right);
 				List_clear_destroy(merged);
-
-				left = List_create();
-				right = List_create();
-
+				*/
+				if(cur != copy->last) {
+					left = List_create();
+					right = List_create();
+				} 
+				
 				i = 0;
 			} else if(cur == copy->last) {
 				List_join(sorted, left);
+				/*
+				List_clear_destroy(left);
+				List_clear_destroy(right);
+				*/
 			}
 		}
-
+		/*
 		List_clear_destroy(copy);
-
+		*/
 		copy = sorted;
 	}
 
