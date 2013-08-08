@@ -193,36 +193,49 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 	int i = 0;
 
 	for(run_size = 1; run_size < list_size; run_size *= 2) {
-
 		sorted_list = List_create();
-		
-		for(i = 0; i < list_size / (2 * run_size); i++) {
 
-			dropped_list = List_create();
+		// if not last step
+		if(2 * run_size < list_size) {
+			for(i = 0; i < list_size / (2 * run_size); i++) {
+				dropped_list = List_create();
+				left_list = List_create();
+				right_list = List_create();
+
+				List_split(list_copy, dropped_list, i * (2 * run_size), left_list, run_size, right_list, run_size);
+				merged_list = List_merge(left_list, right_list, cmp);
+				List_join(sorted_list, merged_list);
+
+				/*
+				List_clear_destroy(dropped_list);
+				List_clear_destroy(left_list);
+				List_clear_destroy(right_list);
+				List_clear_destroy(merged_list);
+				*/
+			}
+			list_copy = sorted_list;
+		// last step
+		} else {			
+			if(list_size % 2 == 1) {
+				List_push(list_copy, list->last->value);
+			}			
+
 			left_list = List_create();
 			right_list = List_create();
 
-			List_split(list_copy, dropped_list, i * (2 * run_size), left_list, run_size, right_list, run_size);
-				
+			List_split(list_copy, left_list, run_size, right_list, run_size);
 			merged_list = List_merge(left_list, right_list, cmp);
-
 			List_join(sorted_list, merged_list);
+			
 			/*
-			List_clear_destroy(dropped_list);
 			List_clear_destroy(left_list);
 			List_clear_destroy(right_list);
 			List_clear_destroy(merged_list);
 			*/
 		}
-
-		if(list_size % (2 * run_size) == 1) {
-	
-			List_push(sorted_list, list_copy->last->value);
-		}
 		/*
 		List_clear_destroy(list_copy);
 		*/
-		list_copy = sorted_list;
 	}
 
 	return sorted_list;

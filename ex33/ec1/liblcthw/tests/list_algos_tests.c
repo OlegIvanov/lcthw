@@ -104,6 +104,7 @@ char *test_insert_sort()
 	// should work on a list that needs sorting
 	List *res = List_insert_sorted(words, (List_compare)strcmp);
 	mu_assert(check_sorting(res, (List_compare)strcmp), "Words are not sorted after insert sort.");
+	mu_assert(List_count(res) == NUM_VALUES, "Wrong count of nodes on insert sort.");
 
 	List *res2 = List_insert_sorted(res, (List_compare)strcmp);
 	mu_assert(check_sorting(res, (List_compare)strcmp), "Should still be sorted after insert sort.");
@@ -123,9 +124,11 @@ char *test_bottom_up_sort()
 	// should work on a list that needs sorting
 	List *res = List_bottom_up_sort(words, (List_compare)strcmp);
 	mu_assert(check_sorting(res, (List_compare)strcmp), "Words are not sorted after bottom up sort.");
+	mu_assert(List_count(res) == NUM_VALUES, "Wrong count of nodes on bottom up sort.");
 
 	List *res2 = List_bottom_up_sort(res, (List_compare)strcmp);
 	mu_assert(check_sorting(res, (List_compare)strcmp), "Should still be sorted after bottom up sort.");
+	mu_assert(List_count(res) == NUM_VALUES, "Wrong count of nodes on bottom up sort.");
 
 	if(res2 != res) List_clear_destroy(res2);
 	if(res != words) List_clear_destroy(res);
