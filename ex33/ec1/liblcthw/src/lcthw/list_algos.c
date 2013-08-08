@@ -208,6 +208,10 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 				merged = List_merge(left, right, cmp);
 				List_join(sorted, merged);
 
+				List_clear_destroy(left);
+				List_clear_destroy(right);
+				List_clear_destroy(merged);
+
 				left = List_create();
 				right = List_create();
 
@@ -216,6 +220,8 @@ List *List_bottom_up_sort(List *list, List_compare cmp)
 				List_join(sorted, left);
 			}
 		}
+
+		List_clear_destroy(copy);
 
 		copy = sorted;
 	}
