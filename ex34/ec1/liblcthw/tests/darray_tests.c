@@ -1,9 +1,26 @@
 #include "minunit.h"
 #include <lcthw/darray.h>
+#include <lcthw/list.h>
+#include <time.h>
 
 static DArray *array = NULL;
 static int *val1 = NULL;
 static int *val2 = NULL;
+
+#define BILLION					1000000000UL
+
+#define DARRAY_PUSH_ITER		500000000L
+#define DARRAY_POP_ITER 		500000000L
+#define DARRAY_REMOVE_ITER		500000000L
+
+#define LIST_PUSH_ITER			10000000L
+#define LIST_POP_ITER			10000000L
+#define LIST_REMOVE_ITER		10000000L
+
+unsigned long get_diff(struct timespec start, struct timespec end)
+{
+	return (unsigned long)(end.tv_sec - start.tv_sec) * BILLION + (unsigned long)(end.tv_nsec - start.tv_nsec);
+}
 
 char *test_create()
 {
@@ -104,6 +121,162 @@ char *test_push_pop()
 	return NULL;
 }
 
+char *test_darray_push_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	int i = 0;
+	char c = 'c';
+
+	DArray *darr = DArray_create(sizeof(char), DARRAY_PUSH_ITER);
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+	for(i = 0; i < DARRAY_PUSH_ITER; i++) {
+		DArray_push(darr, &c);
+	}
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+	
+	diff = (double)get_diff(start, end) / DARRAY_PUSH_ITER;
+	printf("\nDArray push took %lf nanoseconds to run.\n", diff);
+
+	DArray_destroy(darr);
+
+	return NULL;
+}
+
+char *test_list_push_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	int i = 0;
+	char c = 'c';
+
+	List *list = List_create();
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+	for(i = 0; i < LIST_PUSH_ITER; i++) {
+		List_push(list, &c);
+	}
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+	
+	diff = (double)get_diff(start, end) / LIST_PUSH_ITER;
+	printf("\nList push took %lf nanoseconds to run.\n", diff);
+
+	List_clear_destroy(list);
+
+	return NULL;
+}
+
+char *test_darray_pop_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	int i = 0;
+	char c = 'c';
+	char *popped = NULL;
+
+	DArray *darr = DArray_create(sizeof(char), DARRAY_POP_ITER);
+	for(i = 0; i < DARRAY_POP_ITER; i++) {
+		DArray_push(darr, &c);
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+	for(i = 0; i < DARRAY_POP_ITER; i++) {
+		popped = DArray_pop(darr);
+	}
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+	
+	diff = (double)get_diff(start, end) / DARRAY_POP_ITER;
+	printf("\nDArray pop took %lf nanoseconds to run.\n", diff);
+
+	DArray_destroy(darr);
+
+	return NULL;
+}
+
+char *test_list_pop_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	int i = 0;
+	char c = 'c';
+	char *popped = NULL;
+
+	List *list = List_create();
+	for(i = 0; i < LIST_POP_ITER; i++) {
+		List_push(list, &c);
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+	for(i = 0; i < LIST_POP_ITER; i++) {
+		popped = List_pop(list);
+	}
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+	
+	diff = (double)get_diff(start, end) / LIST_POP_ITER;
+	printf("\nList pop took %lf nanoseconds to run.\n", diff);
+
+	List_clear_destroy(list);
+
+	return NULL;
+}
+
+char *test_darray_remove_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	int i = 0;
+	char c = 'c';
+	char *removed = NULL;
+
+	DArray *darr = DArray_create(sizeof(char), 1);
+	for(i = 0; i < DARRAY_REMOVE_ITER; i++) {
+		DArray_push(darr, &c);
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+	for(i = DARRAY_REMOVE_ITER - 1; i >= 0; i--) {
+		removed = DArray_remove(darr, i);
+	}
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+	
+	diff = (double)get_diff(start, end) / DARRAY_REMOVE_ITER;
+	printf("\nDArray remove took %lf nanoseconds to run.\n", diff);
+
+	DArray_destroy(darr);
+
+	return NULL;
+}
+
+char *test_list_remove_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	int i = 0;
+	char c = 'c';
+	ListNode *node_addresses[LIST_REMOVE_ITER] = {NULL};
+	char *removed = NULL;
+
+	List *list = List_create();
+	for(i = 0; i < LIST_REMOVE_ITER; i++) {
+		List_push(list, &c);
+		node_addresses[i] = list->last;
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+	for(i = LIST_REMOVE_ITER - 1; i >= 0; i--) {
+		removed = List_remove(list, node_addresses[i]);
+	}
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+	
+	diff = (double)get_diff(start, end) / LIST_REMOVE_ITER;
+	printf("\nList remove took %lf nanoseconds to run.\n", diff);
+
+	List_clear_destroy(list);
+
+	return NULL;
+}
+
 char *all_tests() {
 	mu_suite_start();
 
@@ -115,6 +288,13 @@ char *all_tests() {
 	mu_run_test(test_expand_contract);
 	mu_run_test(test_push_pop);
 	mu_run_test(test_destroy);
+
+	mu_run_test(test_darray_push_perfomance);
+	mu_run_test(test_list_push_perfomance);
+	mu_run_test(test_darray_pop_perfomance);
+	mu_run_test(test_list_pop_perfomance);
+	mu_run_test(test_darray_remove_perfomance);
+	mu_run_test(test_list_remove_perfomance);
 
 	return NULL;
 }
