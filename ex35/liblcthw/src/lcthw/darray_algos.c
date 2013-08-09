@@ -31,8 +31,8 @@ int DArray_heapsort(DArray *array, DArray_compare cmp)
 			current_index = j;
 			parent_index = get_parent_index(current_index);
 
-			current_value = DArray_get(current_index);
-			parent_value = DArray_get(parent_index);
+			current_value = DArray_get(array, current_index);
+			parent_value = DArray_get(array, parent_index);
 
 			while(cmp(current_value, parent_value) > 0) {
 
@@ -42,8 +42,8 @@ int DArray_heapsort(DArray *array, DArray_compare cmp)
 				current_index = parent_index;
 				parent_index = get_parent_index(current_index);
 
-				current_value = DArray_get(current_index);
-				parent_value = DArray_get(parent_index);
+				current_value = DArray_get(array, current_index);
+				parent_value = DArray_get(array, parent_index);
 			}
 		}
 
