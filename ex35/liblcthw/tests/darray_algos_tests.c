@@ -8,7 +8,7 @@ int testcmp(char **a, char **b)
 
 DArray *create_words()
 {
-	DArray *result = DArray_create(0, 5);
+	DArray *result = DArray_create(100, 5);
 	char *words[] = {"asdfasfd", "werwar", "13234", "asdfasfd", "oioj"};
 	int i = 0;
 
@@ -42,7 +42,7 @@ char *run_sort_test(int (*func)(DArray *, DArray_compare), const char *name)
 	mu_assert(rc == 0, "sort failed");
 	mu_assert(is_sorted(words), "didn't sort it");
 
-	DArrray_destroy(words);
+	DArray_destroy(words);
 
 	return NULL;
 }
@@ -51,7 +51,7 @@ char *test_qsort()
 {
 	return run_sort_test(DArray_qsort, "qsort");
 }
-
+/*
 char *test_heapsort()
 {
 	return run_sort_test(DArray_heapsort, "heapsort");
@@ -61,15 +61,16 @@ char *test_mergesort()
 {
 	return run_sort_test(DArray_mergesort, "mergesort");
 }
-
+*/
 char *all_tests()
 {
 	mu_suite_start();
 
 	mu_run_test(test_qsort);
+	/*
 	mu_run_test(test_heapsort);
 	mu_run_test(test_mergesort);
-
+	*/
 	return NULL;
 }
 
