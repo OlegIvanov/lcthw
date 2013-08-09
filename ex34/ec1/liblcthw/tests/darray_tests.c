@@ -78,7 +78,7 @@ char *test_expand_contract()
 	mu_assert((unsigned int)array->max == array->expand_rate + 1, "Should stay at the expand_rate at least.");
 	
 	DArray_contract(array);
-	mu_assert((unsigned int)array->max == array->expand_rate + 1, "Should stay at the expand rate at least.");
+	mu_assert((unsigned int)array->max == array->expand_rate + 1, "Should stay at the expand_rate at least.");
 
 	return NULL;
 }

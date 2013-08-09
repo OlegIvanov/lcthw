@@ -38,7 +38,10 @@ void DArray_clear_destroy(DArray *array);
 
 static inline void DArray_set(DArray *array, int i, void *el)
 {
+	check(array, "array can't be NULL");
 	check(i < array->max, "darray attempt to set past max");
+	check(i >= 0, "index 'i' can't be negative");
+
 	if(i > array->end) array->end = i;
 	array->contents[i] = el;
 error:
@@ -47,7 +50,10 @@ error:
 
 static inline void *DArray_get(DArray *array, int i)
 {
+	check(array, "array can't be NULL");
 	check(i < array->max, "darray attempt to get past max");
+	check(i >= 0, "index 'i' can't be negative");
+	
 	return array->contents[i];
 error:
 	return NULL;
@@ -55,19 +61,25 @@ error:
 
 static inline void *DArray_remove(DArray *array, int i)
 {
+	check(array, "array can't be NULL");
+	check(i < array->max, "darray attempt to remove past max");
+	check(i >= 0, "index 'i' can't be negative");
+
 	void *el = array->contents[i];
 
 	array->contents[i] = NULL;
 	
 	return el;
+error:
+	return NULL;
 }
 
 static inline void *DArray_new(DArray *array)
 {
+	check(array, "array can't be NULL");
 	check(array->element_size > 0, "Can't use DArray_new on 0 size darrays.");
 
 	return calloc(1, array->element_size);
-
 error:
 	return NULL;
 }
