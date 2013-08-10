@@ -10,7 +10,11 @@ int DArray_qsort(DArray *array, DArray_compare cmp)
 
 static inline int get_parent_index(int child_index)
 {
+	check(child_index > 0, "'child_index' can't be '0' because it's root index");
+
 	return (child_index % 2) ? (child_index - 1) / 2 : (child_index - 2) / 2;
+error:
+	return -1;
 }
 
 int DArray_heapsort(DArray *array, DArray_compare cmp)
@@ -38,6 +42,9 @@ int DArray_heapsort(DArray *array, DArray_compare cmp)
 
 				DArray_set(array, current_index, parent_value);
 				DArray_set(array, parent_index, current_value);
+
+				// if "root" has been reached
+				if(parent_index == 0) break;
 
 				current_index = parent_index;
 				parent_index = get_parent_index(current_index);
