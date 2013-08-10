@@ -11,4 +11,6 @@ int DArray_heapsort(DArray *array, DArray_compare cmp);
 
 int DArray_mergesort(DArray *array, DArray_compare cmp);
 
+int DArray_quicksort(DArray *array, DArray_compare cmp);
+
 #endif

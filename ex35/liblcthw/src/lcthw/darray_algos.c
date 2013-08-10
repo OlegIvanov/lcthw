@@ -148,3 +148,64 @@ int DArray_mergesort(DArray *array, DArray_compare cmp)
 {
 	return DArray_mergesort_utility(array, 0, DArray_count(array), cmp);
 }
+
+static inline int DArray_partition(DArray *array, int first_index, int last_index, DArray_compare cmp)
+{
+	int count = last_index - first_index + 1;
+	int pivot_index = first_index + count / 2;
+	void *pivot_value = DArray_get(array, pivot_index);
+
+	int i = first_index;
+	int j = last_index;
+	void *i_value = NULL, *j_value = NULL, *buf_value = NULL;
+
+	do {
+		i_value = DArray_get(array, i);
+		
+		while(cmp(&i_value, &pivot_value) < 0) {
+			i++;
+			i_value = DArray_get(array, i);
+		}
+	
+		j_value = DArray_get(array, j);
+
+		while(cmp(&j_value, &pivot_value) > 0) {
+			j--;
+			j_value = DArray_get(array, j);
+		}
+
+		if(i <= j) {
+			buf_value = DArray_get(array, i);
+			DArray_set(array, i, DArray_get(array, j));
+			DArray_set(array, j, buf_value);
+
+			i++, j--;
+		}
+
+	} while(i <= j);
+
+	return pivot_index;
+}
+
+static int DArray_quicksort_utility(DArray *array, int first_index, int last_index, DArray_compare cmp)
+{
+	check(array, "argument 'array' can't be NULL");
+
+	int count = last_index - first_index + 1;
+
+	if(count < 2) return 0;
+
+	int pivot_index = DArray_partition(array, first_index, last_index, cmp);
+
+	DArray_quicksort_utility(array, first_index, pivot_index - 1, cmp);
+	DArray_quicksort_utility(array, pivot_index + 1, last_index, cmp);
+
+	return 0;
+error:
+	return -1;
+}
+
+int DArray_quicksort(DArray *array, DArray_compare cmp)
+{
+	return DArray_quicksort_utility(array, 0, DArray_count(array) - 1, cmp);
+}

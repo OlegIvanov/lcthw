@@ -8,11 +8,12 @@ int testcmp(char **a, char **b)
 
 DArray *create_words()
 {
-	DArray *result = DArray_create(100, 5);
-	char *words[] = {"asdfasfd", "werwar", "13234", "asdfasfd", "oioj"};
+	DArray *result = DArray_create(100, 15);
+	char *words[] = {"asdfasfd", "werwar", "13234", "asdfasfd", "oioj", "trololo", "I", "like", "big", "boobs", 
+			"piss", "coming", "from", "my", "ass"};
 	int i = 0;
 
-	for(i = 0; i < 5; i++) {
+	for(i = 0; i < 15; i++) {
 		DArray_push(result, words[i]);
 	}
 
@@ -62,6 +63,11 @@ char *test_mergesort()
 	return run_sort_test(DArray_mergesort, "mergesort");
 }
 
+char *test_quicksort()
+{
+	return run_sort_test(DArray_quicksort, "quicksort");
+}
+
 char *all_tests()
 {
 	mu_suite_start();
@@ -69,6 +75,7 @@ char *all_tests()
 	mu_run_test(test_qsort);
 	mu_run_test(test_heapsort);
 	mu_run_test(test_mergesort);
+	mu_run_test(test_quicksort);
 
 	return NULL;
 }
