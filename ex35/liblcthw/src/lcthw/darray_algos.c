@@ -38,7 +38,7 @@ int DArray_heapsort(DArray *array, DArray_compare cmp)
 			current_value = DArray_get(array, current_index);
 			parent_value = DArray_get(array, parent_index);
 
-			while(strcmp(current_value, parent_value) > 0) {
+			while(cmp(&current_value, &parent_value) > 0) {
 
 				DArray_set(array, current_index, parent_value);
 				DArray_set(array, parent_index, current_value);
