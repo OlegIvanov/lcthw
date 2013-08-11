@@ -152,41 +152,35 @@ int DArray_mergesort(DArray *array, DArray_compare cmp)
 static inline int DArray_partition(DArray *array, int first_index, int last_index, DArray_compare cmp)
 {
 	int count = last_index - first_index + 1;
-
-	check(count < 2, "'count' must be >= 2");
+	check(count > 2, "'count' must be > 2");
 
 	int pivot_index = first_index + count / 2;
 	void *pivot_value = DArray_get(array, pivot_index);
 
-	int i = first_index;
-	int j = last_index;
-	void *i_value = NULL, *j_value = NULL;
+	DArray_set(array, pivot_index, DArray_get(array, last_index));
+	DArray_set(array, last_index, pivot_value);
 
-	do {
-		i_value = DArray_get(array, i);
-		
-		while(cmp(&i_value, &pivot_value) < 0) {
-			i++;
-			i_value = DArray_get(array, i);
-		}
+	int i = 0;
+	void *i_value = NULL;
+	int new_pivot_index = first_index;
 	
-		j_value = DArray_get(array, j);
+	for(i = first_index; i < last_index; i++) {
+		i_value = DArray_get(array, i);
 
-		while(cmp(&j_value, &pivot_value) > 0) {
-			j--;
-			j_value = DArray_get(array, j);
+		if(cmp(&i_value, &pivot_value) < 0) {
+
+			DArray_set(array, i, DArray_get(array, new_pivot_index));
+			DArray_set(array, new_pivot_index, i_value);
+			
+			new_pivot_index++;
 		}
+	}
 
-		if(i <= j) {
-			DArray_set(array, i, j_value);
-			DArray_set(array, j, i_value);
+	void *buf_value = DArray_get(array, new_pivot_index);
+	DArray_set(array, new_pivot_index, DArray_get(array, last_index));
+	DArray_set(array, last_index, buf_value);
 
-			i++, j--;
-		}
-
-	} while(i <= j);
-
-	return pivot_index;
+	return new_pivot_index;
 error:
 	return -1;
 }
@@ -195,14 +189,14 @@ static int DArray_quicksort_utility(DArray *array, int first_index, int last_ind
 {
 	check(array, "argument 'array' can't be NULL");
 
-	int count = last_index - first_index + 1;
+	int new_pivot_index = 0;
 
-	if(count < 2) return 0;
+	if(first_index < last_index) {
 
-	int pivot_index = DArray_partition(array, first_index, last_index, cmp);
-
-	DArray_quicksort_utility(array, first_index, pivot_index - 1, cmp);
-	DArray_quicksort_utility(array, pivot_index + 1, last_index, cmp);
+		new_pivot_index = DArray_partition(array, first_index, last_index, cmp);
+		DArray_quicksort_utility(array, first_index, new_pivot_index - 1, cmp);
+		DArray_quicksort_utility(array, new_pivot_index + 1, last_index, cmp);
+	}
 
 	return 0;
 error:
