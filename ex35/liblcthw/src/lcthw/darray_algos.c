@@ -151,8 +151,9 @@ int DArray_mergesort(DArray *array, DArray_compare cmp)
 
 static inline int DArray_partition(DArray *array, int first_index, int last_index, DArray_compare cmp)
 {
+	check(last_index - first_index > 0, "subarray length must be >= 2");
+
 	int count = last_index - first_index + 1;
-	check(count > 2, "'count' must be > 2");
 
 	int pivot_index = first_index + count / 2;
 	void *pivot_value = DArray_get(array, pivot_index);
@@ -168,9 +169,10 @@ static inline int DArray_partition(DArray *array, int first_index, int last_inde
 		i_value = DArray_get(array, i);
 
 		if(cmp(&i_value, &pivot_value) < 0) {
-
-			DArray_set(array, i, DArray_get(array, new_pivot_index));
-			DArray_set(array, new_pivot_index, i_value);
+			if(i != new_pivot_index) {
+				DArray_set(array, i, DArray_get(array, new_pivot_index));
+				DArray_set(array, new_pivot_index, i_value);
+			}
 			
 			new_pivot_index++;
 		}
