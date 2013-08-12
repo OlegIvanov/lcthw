@@ -72,30 +72,38 @@ static void RadixMap_sort_optimized(RadixMap *map, uint64_t max, size_t starting
 {
 	uint64_t *source = &map->contents[starting_index].raw;
 	uint64_t *temp = &map->temp[starting_index].raw;
-
+	
 	int i = 0;
-	int count_significant_digits = 0;
+	int significant_digits = 0;
 
 	for(i = 0; i < 4; i++) {
-		if(ByteOf(&biggest_key, i) != 0) {
-			count_significant_digits++;
-		} else {
-			break;
-		}
+		if(ByteOf(&biggest_key, i) != 0) significant_digits++;
 	}
 
-	for(i = 0; i < count_significant_digits; i++) {
-		if(i % 2 == 0) {
-			radix_sort(i, max, source, temp);			
-		} else {
-			radix_sort(i, max, temp, source);
-		}
-	}
-	
-	// if not all "digits" were sorted and the outcome of sorting was not placed to source
-	// then copy elements from temp to source
-	if(count_significant_digits != 4 && count_significant_digits % 2 == 0) {
-		memcpy(source, temp, max * sizeof(uint64_t));
+	switch(significant_digits) {
+		case 1:
+			radix_sort(0, max, source, temp);
+			memcpy(source, temp, max * sizeof(uint64_t));
+			break;
+
+		case 2:
+			radix_sort(0, max, source, temp);
+			radix_sort(1, max, temp, source);
+			break;
+
+		case 3:
+			radix_sort(0, max, source, temp);
+			radix_sort(1, max, temp, source);
+			radix_sort(2, max, source, temp);
+			memcpy(source, temp, max * sizeof(uint64_t));
+			break;
+
+		case 4:
+			radix_sort(0, max, source, temp);
+			radix_sort(1, max, temp, source);
+			radix_sort(2, max, source, temp);
+			radix_sort(3, max, temp, source);
+			break;
 	}
 }
 
