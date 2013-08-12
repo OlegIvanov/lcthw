@@ -105,41 +105,6 @@ RMElement *RadixMap_find(RadixMap *map, uint32_t to_find)
 	return NULL;
 }
 
-int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value)
-{
-	check(key < UINT32_MAX, "Key can't be equal to UINT32_MAX.");
-
-	RMElement element = {.data = {.key = key, .value = value}};
-	check(map->end + 1 < map->max, "RadixMap is full.");
-
-	map->contents[map->end++] = element;
-
-	RadixMap_sort(map);
-
-	return 0;
-error:
-	return -1;
-}
-
-int RadixMap_delete(RadixMap *map, RMElement *el)
-{
-	check(map->end > 0, "There is nothing to delete.");
-	check(el != NULL, "Can't delete a NULL element.");
-
-	el->data.key = UINT32_MAX;
-
-	if(map->end > 1) {
-		// don't bother resorting a map of 1 length
-		RadixMap_sort(map);
-	}
-
-	map->end--;
-
-	return 0;
-error:
-	return -1;
-}
-
 static int RadixMap_find_min_position(RadixMap *map, uint32_t to_find)
 {
 	int low = 0;
@@ -163,18 +128,43 @@ static int RadixMap_find_min_position(RadixMap *map, uint32_t to_find)
 	return middle;
 }
 
-int RadixMap_add_optimized(RadixMap *map, uint32_t key, uint32_t value)
+int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value, int optimize)
 {
 	check(key < UINT32_MAX, "Key can't be equal to UINT32_MAX.");
 
 	RMElement element = {.data = {.key = key, .value = value}};
 	check(map->end + 1 < map->max, "RadixMap is full.");
 
- 	int min_position = RadixMap_find_min_position(map, key);
+	if(optimize) {
+		int min_position = RadixMap_find_min_position(map, key);
 
-	map->contents[map->end++] = element;
-	// sorting starting from 'min_position' index 'map->end - min_position' elements
-	RadixMap_sort_starting_from(map, map->end - min_position, min_position);
+		map->contents[map->end++] = element;
+		// sort starting from 'min_position' index 'map->end - min_position' elements
+		RadixMap_sort_starting_from(map, map->end - min_position, min_position);
+	} else {
+		map->contents[map->end++] = element;
+
+		RadixMap_sort(map);
+	}
+
+	return 0;
+error:
+	return -1;
+}
+
+int RadixMap_delete(RadixMap *map, RMElement *el)
+{
+	check(map->end > 0, "There is nothing to delete.");
+	check(el != NULL, "Can't delete a NULL element.");
+
+	el->data.key = UINT32_MAX;
+
+	if(map->end > 1) {
+		// don't bother resorting a map of 1 length
+		RadixMap_sort(map);
+	}
+
+	map->end--;
 
 	return 0;
 error:

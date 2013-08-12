@@ -13,6 +13,7 @@ typedef struct RadixMap {
 	size_t max;
 	size_t end;
 	uint32_t counter;
+	uint32_t biggest_key;
 	RMElement *contents;
 	RMElement *temp;
 } RadixMap;
@@ -25,10 +26,8 @@ void RadixMap_sort(RadixMap *map);
 
 RMElement *RadixMap_find(RadixMap *map, uint32_t key);
 
-int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value);
+int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value, int optimize);
 
 int RadixMap_delete(RadixMap *map, RMElement *el);
-
-int RadixMap_add_optimized(RadixMap *map, uint32_t key, uint32_t value);
 
 #endif
