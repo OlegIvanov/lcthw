@@ -67,15 +67,20 @@ static inline void radix_sort(short offset, uint64_t max, uint64_t *source, uint
 	}
 }
 
+static void RadixMap_sort_starting_from(RadixMap *map, uint64_t max, size_t starting_index)
+{
+	uint64_t *source = &map->contents[starting_index].raw;
+	uint64_t *temp = &map->temp[starting_index].raw;
+
+	radix_sort(0, max, source, temp);
+	radix_sort(1, max, temp, source);
+	radix_sort(2, max, source, temp);
+	radix_sort(3, max, temp, source);
+}
+
 void RadixMap_sort(RadixMap *map)
 {
-	uint64_t *source = &map->contents[0].raw;
-	uint64_t *temp = &map->temp[0].raw;
-
-	radix_sort(0, map->end, source, temp);
-	radix_sort(1, map->end, temp, source);
-	radix_sort(2, map->end, source, temp);
-	radix_sort(3, map->end, temp, source);
+	RadixMap_sort_starting_from(map, map->end, 0);
 }
 
 RMElement *RadixMap_find(RadixMap *map, uint32_t to_find)
@@ -105,7 +110,7 @@ int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value)
 	check(key < UINT32_MAX, "Key can't be equal to UINT32_MAX.");
 
 	RMElement element = {.data = {.key = key, .value = value}};
-	check(map->end + 1 < map->max, "RadixMAp is full.");
+	check(map->end + 1 < map->max, "RadixMap is full.");
 
 	map->contents[map->end++] = element;
 
@@ -129,6 +134,47 @@ int RadixMap_delete(RadixMap *map, RMElement *el)
 	}
 
 	map->end--;
+
+	return 0;
+error:
+	return -1;
+}
+
+static int RadixMap_find_min_position(RadixMap *map, uint32_t to_find)
+{
+	int low = 0;
+	int high = map->end - 1;
+	RMElement *data = map->contents;
+	int middle = low;
+
+	while(low <= high) {
+		middle = low + (high - low) / 2;
+		uint32_t key = data[middle].data.key;
+
+		if(to_find < key) {
+			high = middle - 1;
+		} else if(to_find > key) {
+			low = middle + 1;
+		} else {
+			return middle;
+		}
+	}
+
+	return middle;
+}
+
+int RadixMap_add_optimized(RadixMap *map, uint32_t key, uint32_t value)
+{
+	check(key < UINT32_MAX, "Key can't be equal to UINT32_MAX.");
+
+	RMElement element = {.data = {.key = key, .value = value}};
+	check(map->end + 1 < map->max, "RadixMap is full.");
+
+ 	int min_position = RadixMap_find_min_position(map, key);
+
+	map->contents[map->end++] = element;
+
+	RadixMap_sort_starting_from(map, map->end - min_position, min_position);
 
 	return 0;
 error:

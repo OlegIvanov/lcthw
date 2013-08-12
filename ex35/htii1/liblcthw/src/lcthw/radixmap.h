@@ -29,4 +29,6 @@ int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value);
 
 int RadixMap_delete(RadixMap *map, RMElement *el);
 
+int RadixMap_add_optimized(RadixMap *map, uint32_t key, uint32_t value);
+
 #endif
