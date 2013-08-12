@@ -169,33 +169,42 @@ static int RadixMap_find_min_position(RadixMap *map, uint32_t to_find)
 	return middle;
 }
 
-int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value, int optimize)
+int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value)
 {
 	check(key < UINT32_MAX, "Key can't be equal to UINT32_MAX.");
 
 	RMElement element = {.data = {.key = key, .value = value}};
 	check(map->end + 1 < map->max, "RadixMap is full.");
 
-	if(optimize) {
-		int min_position = RadixMap_find_min_position(map, key);
+	map->contents[map->end++] = element;
 
-		map->contents[map->end++] = element;
+	if(key < map->smallest_key) map->smallest_key = key;
+
+	if(key > map->biggest_key) map->biggest_key = key;
+
+	RadixMap_sort(map);
+
+	return 0;
+error:
+	return -1;
+}
+
+int RadixMap_add_optimized(RadixMap *map, uint32_t key, uint32_t value)
+{
+	check(key < UINT32_MAX, "Key can't be equal to UINT32_MAX.");
+
+	RMElement element = {.data = {.key = key, .value = value}};
+	check(map->end + 1 < map->max, "RadixMap is full.");
+
+	int min_position = RadixMap_find_min_position(map, key);
+
+	map->contents[map->end++] = element;
 		
-		if(key < map->smallest_key) map->smallest_key = key;
+	if(key < map->smallest_key) map->smallest_key = key;
 
-		if(key > map->biggest_key) map->biggest_key = key;
+	if(key > map->biggest_key) map->biggest_key = key;
 
-		RadixMap_sort_optimized(map, map->end - min_position, min_position, map->smallest_key, map->biggest_key);
-
-	} else {
-		map->contents[map->end++] = element;
-
-		if(key < map->smallest_key) map->smallest_key = key;
-
-		if(key > map->biggest_key) map->biggest_key = key;
-
-		RadixMap_sort(map);
-	}
+	RadixMap_sort_optimized(map, map->end - min_position, min_position, map->smallest_key, map->biggest_key);
 
 	return 0;
 error:

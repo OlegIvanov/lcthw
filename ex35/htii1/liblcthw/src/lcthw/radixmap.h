@@ -27,7 +27,9 @@ void RadixMap_sort(RadixMap *map);
 
 RMElement *RadixMap_find(RadixMap *map, uint32_t key);
 
-int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value, int optimize);
+int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value);
+
+int RadixMap_add_optimized(RadixMap *map, uint32_t key, uint32_t value);
 
 int RadixMap_delete(RadixMap *map, RMElement *el);
 
