@@ -178,10 +178,6 @@ int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value)
 
 	map->contents[map->end++] = element;
 
-	if(key < map->smallest_key) map->smallest_key = key;
-
-	if(key > map->biggest_key) map->biggest_key = key;
-
 	RadixMap_sort(map);
 
 	return 0;
@@ -201,7 +197,6 @@ int RadixMap_add_optimized(RadixMap *map, uint32_t key, uint32_t value)
 	map->contents[map->end++] = element;
 		
 	if(key < map->smallest_key) map->smallest_key = key;
-
 	if(key > map->biggest_key) map->biggest_key = key;
 
 	RadixMap_sort_optimized(map, map->end - min_position, min_position, map->smallest_key, map->biggest_key);
