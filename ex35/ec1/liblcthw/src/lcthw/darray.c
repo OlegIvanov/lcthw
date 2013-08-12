@@ -140,17 +140,13 @@ int DArray_sort_add(DArray *array, void *el, DArray_compare cmp)
 {
 	check(array, "array can't be NULL");
 
-	array->contents[array->end] = el;
-	array->end++;
+	int rc = DArray_push(array, el);
+	check(rc == 0, "push failed");
 
-	int rc = DArray_quicksort(array, cmp);
+	rc = DArray_quicksort(array, cmp);
 	check(rc == 0, "sort failed");
 
-	if(DArray_end(array) >= DArray_max(array)) {
-		return DArray_expand(array);
-	} else {
-		return 0;
-	}
+	return 0;
 error:
 	return -1;
 }

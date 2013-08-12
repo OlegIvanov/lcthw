@@ -1,5 +1,6 @@
 #include "minunit.h"
 #include <lcthw/darray.h>
+#include <lcthw/darray_algos.h>
 #include <lcthw/list.h>
 #include <time.h>
 
@@ -277,6 +278,55 @@ char *test_list_remove_perfomance()
 	return NULL;
 }
 
+int is_sorted(DArray *array)
+{
+	int i = 0;
+	double *a = NULL, *b = NULL;
+
+	for(i = 0; i < DArray_count(array) - 1; i++) {
+		a = DArray_get(array, i);
+		b = DArray_get(array, i + 1);
+
+		if(*a > *b) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+int double_comparator(double **a, double **b)
+{
+	if(**a < **b) {
+		return -1;
+	} else if(**a > **b) {
+		return 1;
+	}
+
+	return 0;
+}
+
+char *test_sort_add()
+{
+	DArray *array = DArray_create(sizeof(double), 100);
+	
+	double array_helper[100];
+	int i = 0;
+	
+	for(i = 0; i < 100; i++) {
+		array_helper[i] = (double)rand();
+
+		int rc = DArray_sort_add(array, &array_helper[i], (DArray_compare)double_comparator);
+
+		mu_assert(rc == 0, "sort_add failed");
+		mu_assert(is_sorted(array), "has not been sorted after adding");
+	}
+
+	DArray_destroy(array);
+
+	return NULL;
+}
+
 char *all_tests() {
 	mu_suite_start();
 
@@ -288,6 +338,10 @@ char *all_tests() {
 	mu_run_test(test_expand_contract);
 	mu_run_test(test_push_pop);
 	mu_run_test(test_destroy);
+
+	srand(time(NULL));
+
+	mu_run_test(test_sort_add);
 
 	mu_run_test(test_darray_push_perfomance);
 	mu_run_test(test_list_push_perfomance);
