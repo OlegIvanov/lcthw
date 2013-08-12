@@ -114,7 +114,7 @@ static void RadixMap_sort_optimized(RadixMap *map, uint64_t max, size_t starting
 		significant_digits++;
 	}
 
-	if(significant_digits % 2 == 1) {
+	if(significant_digits > 0 && significant_digits % 2 == 1) {
 		memcpy(source, temp, max * sizeof(uint64_t));
 	}
 }
