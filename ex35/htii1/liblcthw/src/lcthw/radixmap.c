@@ -173,7 +173,7 @@ int RadixMap_add_optimized(RadixMap *map, uint32_t key, uint32_t value)
  	int min_position = RadixMap_find_min_position(map, key);
 
 	map->contents[map->end++] = element;
-
+	// sorting starting from 'min_position' index 'map->end - min_position' elements
 	RadixMap_sort_starting_from(map, map->end - min_position, min_position);
 
 	return 0;
