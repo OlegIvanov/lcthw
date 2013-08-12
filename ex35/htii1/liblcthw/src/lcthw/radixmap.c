@@ -72,8 +72,8 @@ static inline void radix_sort(short offset, uint64_t max, uint64_t *source, uint
 	}
 }
 
-static void RadixMap_sort_optimized(RadixMap *map, uint64_t max, size_t starting_index, 
-									uint32_t smallest_key, uint32_t biggest_key)
+static void RadixMap_sort_optimized(RadixMap *map, uint64_t max, size_t starting_index,
+										uint32_t smallest_key, uint32_t biggest_key)
 {
 	uint64_t *source = &map->contents[starting_index].raw;
 	uint64_t *temp = &map->temp[starting_index].raw;
