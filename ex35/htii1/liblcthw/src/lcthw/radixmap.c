@@ -21,6 +21,7 @@ RadixMap *RadixMap_create(size_t max)
 
 	map->max = max;
 	map->end = 0;
+	map->biggest_key = 0;
 
 	return map;
 error:
@@ -67,20 +68,40 @@ static inline void radix_sort(short offset, uint64_t max, uint64_t *source, uint
 	}
 }
 
-static void RadixMap_sort_starting_from(RadixMap *map, uint64_t max, size_t starting_index)
+static void RadixMap_sort_optimized(RadixMap *map, uint64_t max, size_t starting_index, uint32_t biggest_key)
 {
 	uint64_t *source = &map->contents[starting_index].raw;
 	uint64_t *temp = &map->temp[starting_index].raw;
 
-	radix_sort(0, max, source, temp);
-	radix_sort(1, max, temp, source);
-	radix_sort(2, max, source, temp);
-	radix_sort(3, max, temp, source);
+	int i = 0;
+	int count_significant_digits = 0;
+
+	for(i = 0; i < 4; i++) {
+		if(ByteOf(&biggest_key, i) != 0) {
+			count_significant_digits++;
+		} else {
+			break;
+		}
+	}
+
+	for(i = 0; i < count_significant_digits; i++) {
+		if(i % 2 == 0) {
+			radix_sort(i, max, source, temp);			
+		} else {
+			radix_sort(i, max, temp, source);
+		}
+	}
+	
+	// if not all "digits" were sorted and the outcome of sorting was not placed to source
+	// then copy elements from temp to source
+	if(count_significant_digits != 4 && count_significant_digits % 2 == 0) {
+		memcpy(source, temp, max * sizeof(uint64_t));
+	}
 }
 
 void RadixMap_sort(RadixMap *map)
 {
-	RadixMap_sort_starting_from(map, map->end, 0);
+	RadixMap_sort_optimized(map, map->end, 0, UINT32_MAX);
 }
 
 RMElement *RadixMap_find(RadixMap *map, uint32_t to_find)
@@ -139,10 +160,16 @@ int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value, int optimize)
 		int min_position = RadixMap_find_min_position(map, key);
 
 		map->contents[map->end++] = element;
+
+		if(key > map->biggest_key) map->biggest_key = key;
+
 		// sort starting from 'min_position' index 'map->end - min_position' elements
-		RadixMap_sort_starting_from(map, map->end - min_position, min_position);
+		RadixMap_sort_optimized(map, map->end - min_position, min_position, map->biggest_key);
+
 	} else {
 		map->contents[map->end++] = element;
+
+		if(key > map->biggest_key) map->biggest_key = key;
 
 		RadixMap_sort(map);
 	}
