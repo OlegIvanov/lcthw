@@ -2,20 +2,6 @@
 #include <lcthw/radixmap.h>
 #include <time.h>
 
-static int make_random(RadixMap *map)
-{
-	size_t i = 0;
-
-	for(i = 0; i < map->max - 1; i++) {
-		uint32_t key = (uint32_t)(rand() | rand() << 16);
-		check(RadixMap_add(map, key, i, 1) == 0, "Failed to add key %u.", key);
-	}
-
-	return i;
-error:
-	return 0;
-}
-
 static int check_order(RadixMap *map)
 {
 	RMElement d1, d2;
@@ -34,6 +20,21 @@ static int check_order(RadixMap *map)
 	}
 
 	return 1;
+}
+
+static int make_random(RadixMap *map)
+{
+	size_t i = 0;
+
+	for(i = 0; i < map->max - 1; i++) {
+		uint32_t key = (uint32_t)(rand() | rand() << 16);
+		check(RadixMap_add(map, key, i, 1) == 0, "Failed to add key %u.", key);
+		mu_assert(check_order(map), "RadixMap isn't sorted after add.");
+	}
+
+	return i;
+error:
+	return 0;
 }
 
 static int test_search(RadixMap *map)
