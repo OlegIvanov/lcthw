@@ -8,6 +8,8 @@
 #include <lcthw/radixmap.h>
 #include <lcthw/dbg.h>
 
+#define DIGITS 4
+
 RadixMap *RadixMap_create(size_t max)
 {
 	RadixMap *map = calloc(sizeof(RadixMap), 1);
@@ -21,6 +23,8 @@ RadixMap *RadixMap_create(size_t max)
 
 	map->max = max;
 	map->end = 0;
+
+	map->smallest_key = UINT32_MAX;
 	map->biggest_key = 0;
 
 	return map;
@@ -68,48 +72,56 @@ static inline void radix_sort(short offset, uint64_t max, uint64_t *source, uint
 	}
 }
 
-static void RadixMap_sort_optimized(RadixMap *map, uint64_t max, size_t starting_index, uint32_t biggest_key)
+static void RadixMap_sort_optimized(RadixMap *map, uint64_t max, size_t starting_index, 
+									uint32_t smallest_key, uint32_t biggest_key)
 {
 	uint64_t *source = &map->contents[starting_index].raw;
 	uint64_t *temp = &map->temp[starting_index].raw;
 	
-	int i = 0;
-	int significant_digits = 0;
+	uint32_t range_key = smallest_key | biggest_key;
 
-	for(i = 0; i < 4; i++) {
-		if(ByteOf(&biggest_key, i) != 0) significant_digits++;
+	int i = 0;
+
+	int drop_high_digits = 0;
+	int drop_low_digits = 0;
+
+	for(i = DIGITS - 1; i >= 0; i--) {
+		if(ByteOf(&range_key, i) == 0) {
+			drop_high_digits++;
+		} else {
+			break;
+		}
 	}
 
-	switch(significant_digits) {
-		case 1:
-			radix_sort(0, max, source, temp);
-			memcpy(source, temp, max * sizeof(uint64_t));
+	for(i = 0; i < DIGITS; i++) {
+		if(ByteOf(&range_key, i) == 0) {
+			drop_low_digits++;
+		} else {
 			break;
+		}
+	}
+	
+	int significant_digits = 0;
 
-		case 2:
-			radix_sort(0, max, source, temp);
-			radix_sort(1, max, temp, source);
-			break;
+	for(i = drop_low_digits; i < DIGITS - drop_high_digits; i++) {
 
-		case 3:
-			radix_sort(0, max, source, temp);
-			radix_sort(1, max, temp, source);
-			radix_sort(2, max, source, temp);
-			memcpy(source, temp, max * sizeof(uint64_t));
-			break;
+		if(significant_digits % 2 == 0) {
+			radix_sort(i, max, source, temp);
+		} else {
+			radix_sort(i, max, temp, source);
+		}
 
-		case 4:
-			radix_sort(0, max, source, temp);
-			radix_sort(1, max, temp, source);
-			radix_sort(2, max, source, temp);
-			radix_sort(3, max, temp, source);
-			break;
+		significant_digits++;
+	}
+
+	if(significant_digits % 2 == 1) {
+		memcpy(source, temp, max * sizeof(uint64_t));
 	}
 }
 
 void RadixMap_sort(RadixMap *map)
 {
-	RadixMap_sort_optimized(map, map->end, 0, UINT32_MAX);
+	RadixMap_sort_optimized(map, map->end, 0, 0, UINT32_MAX);
 }
 
 RMElement *RadixMap_find(RadixMap *map, uint32_t to_find)
@@ -168,14 +180,17 @@ int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value, int optimize)
 		int min_position = RadixMap_find_min_position(map, key);
 
 		map->contents[map->end++] = element;
+		
+		if(key < map->smallest_key) map->smallest_key = key;
 
 		if(key > map->biggest_key) map->biggest_key = key;
 
-		// sort starting from 'min_position' index 'map->end - min_position' elements
-		RadixMap_sort_optimized(map, map->end - min_position, min_position, map->biggest_key);
+		RadixMap_sort_optimized(map, map->end - min_position, min_position, map->smallest_key, map->biggest_key);
 
 	} else {
 		map->contents[map->end++] = element;
+
+		if(key < map->smallest_key) map->smallest_key = key;
 
 		if(key > map->biggest_key) map->biggest_key = key;
 

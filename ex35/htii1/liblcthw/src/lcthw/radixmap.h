@@ -12,8 +12,9 @@ typedef union RMElement {
 typedef struct RadixMap {
 	size_t max;
 	size_t end;
-	uint32_t counter;
+	uint32_t smallest_key;
 	uint32_t biggest_key;
+	uint32_t counter;
 	RMElement *contents;
 	RMElement *temp;
 } RadixMap;
