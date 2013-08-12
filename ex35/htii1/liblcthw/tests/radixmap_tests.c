@@ -2,6 +2,16 @@
 #include <lcthw/radixmap.h>
 #include <time.h>
 
+#define BILLION 1000000000UL
+
+#define MAPS_COUNT 1000L
+#define MAP_SIZE 1000L
+
+static unsigned long get_diff(struct timespec start, struct timespec end)
+{
+	return (unsigned long)(end.tv_sec - start.tv_sec) * BILLION + (unsigned long)(end.tv_nsec - start.tv_nsec);
+}
+
 static int check_order(RadixMap *map)
 {
 	RMElement d1, d2;
@@ -90,12 +100,85 @@ static char *test_operations()
 	return NULL;
 }
 
+char *test_radixmap_add_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	
+	int i = 0, j = 0;
+	RadixMap *maps[MAPS_COUNT] = {NULL};
+
+	for(i = 0; i < MAPS_COUNT; i++) {
+		maps[i] = RadixMap_create(MAP_SIZE);
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+
+	for(i = 0; i < MAPS_COUNT; i++) {
+	
+		for(j = 0; j < maps[i]->max - 1; j++) {
+			uint32_t key = (uint32_t)(rand() | rand() << 16);
+			RadixMap_add(maps[i], key, j);
+		}
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+
+	diff = (double)get_diff(start, end) / MAPS_COUNT / (MAP_SIZE - 1);
+	printf("\nRadixMap add took %lf nanoseconds to run.\n\n", diff);
+
+	for(i = 0; i < MAPS_COUNT; i++) {
+		mu_assert(check_order(maps[i]), "Failed to properly sort the RadixMap.");
+		RadixMap_destroy(maps[i]);
+	}
+
+	return NULL;
+}
+
+char *test_radixmap_add_optimized_perfomance()
+{
+	struct timespec start, end;
+	double diff;
+	
+	int i = 0, j = 0;
+	RadixMap *maps[MAPS_COUNT] = {NULL};
+
+	for(i = 0; i < MAPS_COUNT; i++) {
+		maps[i] = RadixMap_create(MAP_SIZE);
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+
+	for(i = 0; i < MAPS_COUNT; i++) {
+	
+		for(j = 0; j < maps[i]->max - 1; j++) {
+			uint32_t key = (uint32_t)(rand() | rand() << 16);
+			RadixMap_add_optimized(maps[i], key, j);
+		}
+	}
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+
+	diff = (double)get_diff(start, end) / MAPS_COUNT / (MAP_SIZE - 1);
+	printf("\nRadixMap add optimized took %lf nanoseconds to run.\n\n", diff);
+
+	for(i = 0; i < MAPS_COUNT; i++) {
+		mu_assert(check_order(maps[i]), "Failed to properly sort the RadixMap.");
+		RadixMap_destroy(maps[i]);
+	}
+
+	return NULL;
+}
+
 char *all_tests()
 {
 	mu_suite_start();
 	srand(time(NULL));
 
 	mu_run_test(test_operations);
+
+	mu_run_test(test_radixmap_add_perfomance);
+	mu_run_test(test_radixmap_add_optimized_perfomance);
 
 	return NULL;
 }
