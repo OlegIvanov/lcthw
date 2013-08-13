@@ -150,3 +150,34 @@ int DArray_sort_add(DArray *array, void *el, DArray_compare cmp)
 error:
 	return -1;
 }
+
+int DArray_find(DArray *array, void *to_find, DArray_compare cmp)
+{
+	check(array, "array can't be NULL");
+
+	int low = 0;
+	int high = DArray_end(array) - 1;
+
+	int middle = 0;
+	void *value = NULL;
+	int cmp_result = 0;
+
+	while(low <= high) {
+		middle = low + (high - low) / 2;
+		value = DArray_get(array, middle);
+
+		cmp_result = cmp(&to_find, &value);
+
+		if(cmp_result < 0) {
+			high = middle - 1;
+		} else if(cmp_result > 0) {
+			low = middle + 1;
+		} else {
+			return middle;
+		}
+	}
+	
+	return -1;
+error:
+	return -2;
+}

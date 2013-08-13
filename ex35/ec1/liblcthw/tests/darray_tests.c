@@ -327,6 +327,65 @@ char *test_sort_add()
 	return NULL;
 }
 
+char *test_find()
+{
+	DArray *array = DArray_create(sizeof(double), 100);
+	
+	double array_helper[100];
+	int i = 0;
+
+	for(i = 0; i < 100; i++) {
+		array_helper[i] = (double)(100 - i);
+
+		int rc = DArray_sort_add(array, &array_helper[i], (DArray_compare)double_comparator);
+
+		mu_assert(rc == 0, "sort_add failed");
+	}
+
+	mu_assert(is_sorted(array), "has not been sorted after adding");
+
+	double *to_find = malloc(sizeof(double));
+	
+	// first test
+	*to_find = array_helper[0];
+
+	mu_assert(*(double *)DArray_get(array, 99) == *to_find, "must be equal");
+
+	int fnd_index = DArray_find(array, to_find, (DArray_compare)double_comparator);
+
+	mu_assert(fnd_index == 99, "Wrong index found.");
+
+	// second test
+	*to_find = array_helper[99];
+
+	mu_assert(*(double *)DArray_get(array, 0) == *to_find, "must be equal");
+
+	fnd_index = DArray_find(array, to_find, (DArray_compare)double_comparator);
+
+	mu_assert(fnd_index == 0, "Wrong index found.");
+
+	// third test
+	*to_find = array_helper[50];
+
+	mu_assert(*(double *)DArray_get(array, 49) == *to_find, "must be equal");
+
+	fnd_index = DArray_find(array, to_find, (DArray_compare)double_comparator);
+
+	mu_assert(fnd_index == 49, "Wrong index found.");
+
+	// fourth test
+	*to_find = 1000.00;
+
+	fnd_index = DArray_find(array, to_find, (DArray_compare)double_comparator);
+
+	mu_assert(fnd_index == -1, "Wrong index found. There's no such element like '1000.00' in array.");
+
+	DArray_destroy(array);
+	free(to_find);
+
+	return NULL;
+}
+
 char *all_tests() {
 	mu_suite_start();
 
@@ -342,6 +401,7 @@ char *all_tests() {
 	srand(time(NULL));
 
 	mu_run_test(test_sort_add);
+	mu_run_test(test_find);
 
 	mu_run_test(test_darray_push_perfomance);
 	mu_run_test(test_list_push_perfomance);
