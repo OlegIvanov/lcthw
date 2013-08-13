@@ -68,6 +68,23 @@ char *test_bstrcpy()
 
 char *test_bassign()
 {
+	bstring bstr1 = bfromcstr(cstr);
+	bstring bstr2 = bfromcstr(cstr1);
+
+	mu_assert(bstr1->slen == cstr_len - 1, "Wrong slen value.");
+
+	mu_assert(bstr1->data[bstr1->slen - 1] == 'g', "Wrong last but one character.");
+
+	int res = bassign(bstr1, bstr2);
+	mu_assert(res == BSTR_OK, "bassign failed");
+
+	mu_assert(bstr1->slen == cstr1_len - 1, "Wrong slen value.");
+
+	mu_assert(bstr1->data[bstr1->slen - 1] == 'e', "Wrong last but one character.");
+
+	bdestroy(bstr1);
+	bdestroy(bstr2);
+
 	return NULL;
 }
 
