@@ -43,6 +43,7 @@ Hashmap *Hashmap_create(Hashmap_compare compare, Hashmap_hash hash)
 	map->hash = hash == NULL ? default_hash : hash;
 	map->buckets = DArray_create(sizeof(DArray *), DEFAULT_NUMBER_OF_BUCKETS);
 	map->buckets->end = map->buckets->max; // fake out expanding it
+	map->counter = 0;
 	check_mem(map->buckets);
 
 	return map;
@@ -115,23 +116,6 @@ error:
 	return NULL;
 }
 
-int Hashmap_set(Hashmap *map, void *key, void *data)
-{
-	uint32_t hash = 0;
-	DArray *bucket = Hashmap_find_bucket(map, key, 1, &hash);
-	check(bucket, "Error can't create bucket.");
-
-	HashmapNode *node = Hashmap_node_create(hash, key, data);
-	check_mem(node);
-
-	DArray_sort_add(bucket, node, (DArray_compare)map->compare);
-
-	return 0;
-
-error:
-	return -1;
-}
-
 static inline int Hashmap_get_node(Hashmap *map, uint32_t hash, DArray *bucket, void *key)
 {
 	// create node only for finding purposes
@@ -149,6 +133,31 @@ static inline int Hashmap_get_node(Hashmap *map, uint32_t hash, DArray *bucket, 
 		}
 	}
 
+	return -1;
+}
+
+int Hashmap_set(Hashmap *map, void *key, void *data)
+{
+	uint32_t hash = 0;
+	DArray *bucket = Hashmap_find_bucket(map, key, 1, &hash);
+	check(bucket, "Error can't create bucket.");
+
+	int i = Hashmap_get_node(map, hash, bucket, key);
+
+	if(i < 0) {
+		HashmapNode *node = Hashmap_node_create(hash, key, data);
+		check_mem(node);
+
+		DArray_sort_add(bucket, node, (DArray_compare)map->compare);
+		map->counter++;
+	} else {
+		HashmapNode *node = DArray_get(bucket, i);
+		node->data = data;
+	}
+
+	return 0;
+
+error:
 	return -1;
 }
 
@@ -201,14 +210,18 @@ void *Hashmap_delete(Hashmap *map, void *key)
 
 	HashmapNode *node = DArray_get(bucket, i);
 	void *data = node->data;
-	free(node);
-
-	HashmapNode *ending = DArray_pop(bucket);
-
-	if(ending != node) {
-		// alright looks like it's not the last one, swap it
-		DArray_set(bucket, i, ending);
+	
+	if(i < DArray_end(bucket) - 1) {
+		DArray_set(bucket, i, DArray_last(bucket));
+		DArray_set(bucket, DArray_end(bucket) - 1, node);
 	}
+
+	DArray_free(node);
+	DArray_pop(bucket);
+
+	DArray_heapsort(bucket, (DArray_compare)map->compare);
+
+	map->counter--;
 
 	return data;
 }
