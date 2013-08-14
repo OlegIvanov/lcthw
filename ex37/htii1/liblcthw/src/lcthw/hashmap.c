@@ -3,10 +3,11 @@
 #include <lcthw/hashmap.h>
 #include <lcthw/dbg.h>
 #include <lcthw/bstrlib.h>
+#include <lcthw/darray_algos.h>
 
-static int default_compare(void *a, void *b) 
+static int default_compare(void **a, void **b) 
 {
-	return bstrcmp((bstring)a, (bstring)b);
+	return bstrcmp((bstring)((HashmapNode *)*a)->key, (bstring)((HashmapNode *)*b)->key);
 }
 
 /**
@@ -123,7 +124,7 @@ int Hashmap_set(Hashmap *map, void *key, void *data)
 	HashmapNode *node = Hashmap_node_create(hash, key, data);
 	check_mem(node);
 
-	DArray_push(bucket, node);
+	DArray_sort_add(bucket, node, (DArray_compare)map->compare);
 
 	return 0;
 
@@ -133,12 +134,17 @@ error:
 
 static inline int Hashmap_get_node(Hashmap *map, uint32_t hash, DArray *bucket, void *key)
 {
-	int i = 0;
+	// create node only for finding purposes
+	HashmapNode *temp = Hashmap_node_create(0, key, NULL);
 
-	for(i = 0; i < DArray_end(bucket); i++) {
-		debug("TRY: %d", i);
+	int i = DArray_find(bucket, temp, (DArray_compare)map->compare);
+
+	// don't need it any more
+	free(temp);
+
+	if(i >= 0) {
 		HashmapNode *node = DArray_get(bucket, i);
-		if(node->hash == hash && map->compare(node->key, key) == 0) {
+		if(node->hash == hash) {			
 			return i;
 		}
 	}
