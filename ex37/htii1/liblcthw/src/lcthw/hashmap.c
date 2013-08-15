@@ -198,7 +198,7 @@ static int Hashmap_remove_sort_buckets(Hashmap *map)
 static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
 {
 	if(map->counter < DEFAULT_MAX_LOAD) {
-		return -1;
+		return 0;
 	}
 	
 	// increase number of buckets
@@ -212,7 +212,7 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
 			Hashmap_move_nodes(map);		
 			Hashmap_remove_sort_buckets(map);
 
-			return 0;
+			return map->buckets_number;
 		}
 	// decrease number of buckets
 	} else {
@@ -224,12 +224,11 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
 
 			DArray_contract(map->buckets);
 
-			return 0;
+			return map->buckets_number;
 		}
 	}
 
-error:
-	return -1;
+	return 0;
 }
 
 int Hashmap_set(Hashmap *map, void *key, void *data)
@@ -241,9 +240,7 @@ int Hashmap_set(Hashmap *map, void *key, void *data)
 	int i = Hashmap_get_node(map, hash, bucket, key);
 	
 	if(i < 0) {
-		int rc = Hashmap_rehash(map, 1);
-
-		if(rc == 0) {
+		if(Hashmap_rehash(map, 1) > 0) {
 			// find new bucket
 			bucket = Hashmap_find_bucket(map, key, 1, &hash);
 
