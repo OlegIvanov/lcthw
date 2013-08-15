@@ -142,74 +142,92 @@ static inline int Hashmap_get_node(Hashmap *map, uint32_t hash, DArray *bucket, 
 	return -1;
 }
 
-static int Hashmap_rehash(Hashmap *map)
+static int Hashmap_move_nodes(Hashmap *map)
 {
-	check(map->counter > 0, "Wrong counter for rehash.");
-	
-	int old_buckets_number = map->buckets_number;
-	DArray *buckets = map->buckets;
-
 	int i = 0;
 	int j = 0;
 
-	DArray *bucket = NULL;
-	HashmapNode *node = NULL;
-
-	int new_bucket_n = 0;
-	DArray *new_bucket = NULL;
-	
-	// increase buckets number
-	if(map->counter % DEFAULT_MAX_LOAD == 0) {
-		map->buckets_number += DEFAULT_NUMBER_OF_BUCKETS;
-
-		DArray_expand(buckets);
-		buckets->end = buckets->max; // fake out expanding it
-
-		for(i = 0; i < DArray_count(buckets); i++) {
-			bucket = DArray_get(buckets, i);
-			if(bucket) {
-				for(j = 0; j < DArray_count(bucket); j++) {
-					node = DArray_get(bucket, j);
+	for(i = 0; i < DArray_count(map->buckets); i++) {
+		DArray *bucket = DArray_get(map->buckets, i);
+		if(bucket) {
+			for(j = 0; j < DArray_count(bucket); j++) {
+				HashmapNode *node = DArray_get(bucket, j);
 					
-					if(j < DArray_end(bucket) - 1) {
-						DArray_set(bucket, j, DArray_last(bucket));
-						DArray_set(bucket, DArray_end(bucket) - 1, node);
-					}
+				if(j < DArray_end(bucket) - 1) {
+					DArray_set(bucket, j, DArray_last(bucket));
+					DArray_set(bucket, DArray_end(bucket) - 1, node);
+				}
 
-					DArray_pop(bucket);
+				DArray_pop(bucket);
 
-					new_bucket_n = node->hash % map->buckets_number;
-					new_bucket = DArray_get(buckets, new_bucket_n);
+				int new_bucket_n = node->hash % map->buckets_number;
+				DArray *new_bucket = DArray_get(map->buckets, new_bucket_n);
 					
-					if(!new_bucket) {
-						new_bucket = DArray_create(sizeof(void *), map->buckets_number);
-						DArray_set(buckets, new_bucket_n, new_bucket);
-					}
+				if(!new_bucket) {
+					new_bucket = DArray_create(sizeof(void *), map->buckets_number);
+					DArray_set(map->buckets, new_bucket_n, new_bucket);
+				}
 
-					DArray_push(new_bucket, node);
-				}
-			}
-		}
-		// remove empty buckets and sort not empty ones
-		for(i = 0; i < DArray_count(buckets); i++) {
-			bucket = DArray_get(buckets, i);
-			if(bucket) {
-				if(DArray_count(bucket) == 0) {
-					DArray_destroy(bucket);
-					DArray_remove(buckets, i);
-				} else {
-					DArray_heapsort(bucket, (DArray_compare)map->compare);		
-				}
+				DArray_push(new_bucket, node);
 			}
 		}
 	}
 
-	// decrease buckets number
-	if(map->counter % DEFAULT_MAX_LOAD == 1) {
-		map->buckets_number -= DEFAULT_NUMBER_OF_BUCKETS;
-	}
-	
 	return 0;
+}
+
+static int Hashmap_remove_sort_buckets(Hashmap *map)
+{
+	int i = 0;
+
+	for(i = 0; i < DArray_count(map->buckets); i++) {
+		DArray *bucket = DArray_get(map->buckets, i);
+		if(bucket) {
+			if(DArray_count(bucket) == 0) {
+				DArray_clear_destroy(bucket);
+				DArray_remove(map->buckets, i);
+			} else {
+				DArray_heapsort(bucket, (DArray_compare)map->compare);
+			}
+		}
+	}
+
+	return 0;
+}
+
+static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
+{
+	if(map->counter < DEFAULT_MAX_LOAD) {
+		return -1;
+	}
+	
+	// increase number of buckets
+	if(increase_decrease_buckets) {
+		if((map->counter + 1) % DEFAULT_MAX_LOAD == 1) {
+			map->buckets_number += DEFAULT_NUMBER_OF_BUCKETS;
+
+			DArray_expand(map->buckets);
+			map->buckets->end = map->buckets->max; // fake out expanding it
+	
+			Hashmap_move_nodes(map);		
+			Hashmap_remove_sort_buckets(map);
+
+			return 0;
+		}
+	// decrease number of buckets
+	} else {
+		if(map->counter % DEFAULT_MAX_LOAD == 0) {
+			map->buckets_number -= DEFAULT_NUMBER_OF_BUCKETS;
+		
+			Hashmap_move_nodes(map);
+			Hashmap_remove_sort_buckets(map);
+
+			DArray_contract(map->buckets);
+
+			return 0;
+		}
+	}
+
 error:
 	return -1;
 }
@@ -220,20 +238,18 @@ int Hashmap_set(Hashmap *map, void *key, void *data)
 	DArray *bucket = Hashmap_find_bucket(map, key, 1, &hash);
 	check(bucket, "Error can't create bucket.");
 
-	int found_node_index = Hashmap_get_node(map, hash, bucket, key);
+	int i = Hashmap_get_node(map, hash, bucket, key);
+	
+	if(i < 0) {
+		int rc = Hashmap_rehash(map, 1);
 
-	if(found_node_index < 0 && map->counter > 0 && (map->counter + 1) % DEFAULT_MAX_LOAD == 1) {
-		Hashmap_rehash(map);
+		if(rc == 0) {
+			// find new bucket
+			bucket = Hashmap_find_bucket(map, key, 1, &hash);
 
-		// find new bucket
-		bucket = Hashmap_find_bucket(map, key, 1, &hash);
-		check(bucket, "Error can't create bucket.");
+			check(bucket, "Error can't create bucket.");
+		}
 
-		// get new node from new bucket
-		found_node_index = Hashmap_get_node(map, hash, bucket, key);
-	}
-
-	if(found_node_index < 0) {
 		HashmapNode *node = Hashmap_node_create(hash, key, data);
 		check_mem(node);
 
@@ -241,7 +257,7 @@ int Hashmap_set(Hashmap *map, void *key, void *data)
 
 		map->counter++;
 	} else {
-		HashmapNode *node = DArray_get(bucket, found_node_index);
+		HashmapNode *node = DArray_get(bucket, i);
 		node->data = data;
 	}
 
@@ -311,6 +327,8 @@ void *Hashmap_delete(Hashmap *map, void *key)
 	DArray_heapsort(bucket, (DArray_compare)map->compare);
 
 	map->counter--;
+
+	Hashmap_rehash(map, 0);
 
 	return data;
 }
