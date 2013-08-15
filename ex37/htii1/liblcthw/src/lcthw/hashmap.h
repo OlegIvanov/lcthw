@@ -6,15 +6,14 @@
 
 #define DEFAULT_NUMBER_OF_BUCKETS 100
 
-#define DEFAULT_BUCKETS_EXPAND_RATE 100
-
-#define DEFAULT_LOAD_FACTOR 1000000UL
+#define DEFAULT_MAX_LOAD 1000000UL
 
 typedef int (*Hashmap_compare)(void *a, void *b);
 typedef uint32_t (*Hashmap_hash)(void *key);
 
 typedef struct Hashmap {
 	DArray *buckets;
+	int buckets_number;
 	uint32_t counter;	
 	Hashmap_compare compare;
 	Hashmap_hash hash;
