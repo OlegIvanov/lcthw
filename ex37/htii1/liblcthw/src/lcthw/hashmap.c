@@ -80,7 +80,6 @@ void Hashmap_destroy(Hashmap *map)
 			}
 			DArray_destroy(map->buckets);
 		}
-
 		free(map);
 	}
 }
@@ -313,7 +312,7 @@ void *Hashmap_delete(Hashmap *map, void *key)
 	HashmapNode *node = DArray_get(bucket, i);
 	void *data = node->data;
 	
-	if(i < DArray_end(bucket) - 1) {
+	if(DArray_count(bucket) != 1) {
 		DArray_set(bucket, i, DArray_last(bucket));
 		DArray_set(bucket, DArray_end(bucket) - 1, node);
 	}
@@ -321,10 +320,15 @@ void *Hashmap_delete(Hashmap *map, void *key)
 	DArray_free(node);
 	DArray_pop(bucket);
 
-	DArray_heapsort(bucket, (DArray_compare)map->compare);
-
 	map->counter--;
 
+	DArray_heapsort(bucket, (DArray_compare)map->compare);
+
+	if(DArray_count(bucket) == 0) {
+		DArray_clear_destroy(bucket);
+		DArray_remove(map->buckets, hash % map->buckets_number);
+	}
+	
 	Hashmap_rehash(map, 0);
 
 	return data;
