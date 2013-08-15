@@ -42,11 +42,11 @@ Hashmap *Hashmap_create(Hashmap_compare compare, Hashmap_hash hash)
 	map->compare = compare == NULL ? default_compare : compare;
 	map->hash = hash == NULL ? default_hash : hash;
 
-	map->buckets_number = DEFAULT_NUMBER_OF_BUCKETS;
-
-	map->buckets = DArray_create(sizeof(DArray *), map->buckets_number);
+	map->buckets = DArray_create(sizeof(DArray *), DEFAULT_NUMBER_OF_BUCKETS);
 	map->buckets->expand_rate = DEFAULT_NUMBER_OF_BUCKETS;
 	map->buckets->end = map->buckets->max; // fake out expanding it
+
+	map->buckets_number = DEFAULT_NUMBER_OF_BUCKETS;
 
 	map->counter = 0;
 
