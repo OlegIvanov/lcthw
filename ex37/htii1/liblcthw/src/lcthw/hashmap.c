@@ -184,7 +184,7 @@ static int Hashmap_move_nodes(Hashmap *map)
 		DArray *bucket = DArray_get(map->buckets, i);
 		if(bucket) {
 			if(DArray_count(bucket) == 0) {
-				DArray_clear_destroy(bucket);
+				DArray_destroy(bucket);
 				DArray_remove(map->buckets, i);
 			} else {
 				DArray_heapsort(bucket, (DArray_compare)map->compare);
@@ -328,7 +328,7 @@ void *Hashmap_delete(Hashmap *map, void *key)
 	DArray_heapsort(bucket, (DArray_compare)map->compare);
 
 	if(DArray_count(bucket) == 0) {
-		DArray_clear_destroy(bucket);
+		DArray_destroy(bucket);
 		DArray_remove(map->buckets, hash % map->buckets_number);
 	}
 	
