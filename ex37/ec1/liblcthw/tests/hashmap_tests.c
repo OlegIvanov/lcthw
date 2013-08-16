@@ -226,7 +226,7 @@ static inline struct tagbstring *generate_string()
 	return bstr;
 }
 
-#define STRINGS_NUMBER 1000
+#define STRINGS_NUMBER 100
 
 char *filling_defect()
 {
