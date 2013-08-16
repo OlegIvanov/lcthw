@@ -127,7 +127,7 @@ char *test_rehash()
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 2, "Wrong count traverse.");
 
-	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+	mu_assert(map1->buckets_number == 2, "Wrong buckets number.");
 
 	debug("_______________________________________________");
 
@@ -138,7 +138,7 @@ char *test_rehash()
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 3, "Wrong count traverse.");
 
-	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+	mu_assert(map1->buckets_number == 3, "Wrong buckets number.");
 
 	debug("_______________________________________________");
 
@@ -148,6 +148,24 @@ char *test_rehash()
 	traverse_called = 0;
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 2, "Wrong count traverse.");
+
+	mu_assert(map1->buckets_number == 2, "Wrong buckets number.");
+
+	// delete 2
+	Hashmap_delete(map1, &test2);
+
+	traverse_called = 0;
+	Hashmap_traverse(map1, traverse_good_cb);
+	mu_assert(traverse_called == 1, "Wrong count traverse.");
+
+	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+
+	// delete 3
+	Hashmap_delete(map1, &test3);
+
+	traverse_called = 0;
+	Hashmap_traverse(map1, traverse_good_cb);
+	mu_assert(traverse_called == 0, "Wrong count traverse.");
 
 	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
 	

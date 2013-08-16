@@ -197,17 +197,11 @@ static int Hashmap_move_nodes(Hashmap *map)
 
 static inline int Hashmap_rehash(Hashmap *map, int increase_buckets)
 {
-	if(map->counter < map->default_max_load) {
-		return 0;
-	}
+	if(map->counter == 0) return 0;
 
-	if(!increase_buckets && map->buckets_number == map->default_number_of_buckets) {
-		return 0;
-	}
-	
-	// increase number of buckets
-	if(increase_buckets) {
-		if((map->counter + 1) % map->default_max_load == 1) {
+	if(map->counter % map->default_max_load == 0) {
+		// increase number of buckets
+		if(increase_buckets) {
 			map->buckets_number += map->default_number_of_buckets;
 
 			DArray_expand(map->buckets);
@@ -216,10 +210,8 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_buckets)
 			Hashmap_move_nodes(map);
 
 			return map->buckets_number;
-		}
-	// decrease number of buckets
-	} else {
-		if(map->counter % map->default_max_load == 0) {
+		// decrease number of buckets if it is possible
+		} else if(map->buckets_number > map->default_number_of_buckets) {
 			map->buckets_number -= map->default_number_of_buckets;
 
 			Hashmap_move_nodes(map);
