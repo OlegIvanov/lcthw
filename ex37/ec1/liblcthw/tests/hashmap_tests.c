@@ -2,6 +2,7 @@
 #include <lcthw/hashmap.h>
 #include <assert.h>
 #include <lcthw/bstrlib.h>
+#include <lcthw/perfomance_routines.h>
 
 Hashmap *map = NULL;
 static int traverse_called = 0;
@@ -206,6 +207,55 @@ char *test_rehash()
 	return NULL;
 }
 
+static inline struct tagbstring *generate_string()
+{
+	int str_len = rand() % 99 + 1 + 1;
+	char *str = malloc(str_len);
+
+	int i = 0;
+
+	for(i = 0; i < str_len - 1; i++) {
+		*(str + i) = '0' + rand() % 72 + 1;
+	}
+	*(str + i) = '\0';
+
+	bstring bstr = bfromcstr(str);
+
+	free(str);
+
+	return bstr;
+}
+
+#define STRINGS_NUMBER 1000
+
+char *filling_defect()
+{
+	struct tagbstring *strings[STRINGS_NUMBER] = {NULL};
+
+	int i = 0;
+
+	for(i = 0; i < STRINGS_NUMBER; i++) {
+		strings[i] = generate_string();
+	}
+
+	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 1);
+
+	for(i = 0; i < STRINGS_NUMBER; i++) {
+		debug("%s", bdata(strings[i]));
+		Hashmap_set(map1, strings[i], &expect1);
+	}
+
+	nodes_distribution(map1);
+
+	Hashmap_destroy(map1);
+
+	for(i = 0; i < STRINGS_NUMBER; i++) {
+		bdestroy(strings[i]);
+	}
+
+	return NULL;
+}
+
 char *all_tests()
 {
 	mu_suite_start();
@@ -217,6 +267,11 @@ char *all_tests()
 	mu_run_test(test_destroy);
 	
 	mu_run_test(test_rehash);
+
+	srand(time(NULL));
+	stack_increase();
+
+	mu_run_test(filling_defect);
 
 	return NULL;
 }
