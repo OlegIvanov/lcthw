@@ -34,7 +34,7 @@ static uint32_t default_hash(void *a)
 	return hash;
 }
 
-Hashmap *Hashmap_create(Hashmap_compare compare, Hashmap_hash hash)
+Hashmap *Hashmap_create_advanced(Hashmap_compare compare, Hashmap_hash hash, uint32_t buckets_number, uint32_t max_load)
 {
 	Hashmap *map = calloc(1, sizeof(Hashmap));
 	check_mem(map);
@@ -42,11 +42,14 @@ Hashmap *Hashmap_create(Hashmap_compare compare, Hashmap_hash hash)
 	map->compare = compare == NULL ? default_compare : compare;
 	map->hash = hash == NULL ? default_hash : hash;
 
-	map->buckets = DArray_create(sizeof(DArray *), DEFAULT_NUMBER_OF_BUCKETS);
-	map->buckets->expand_rate = DEFAULT_NUMBER_OF_BUCKETS;
-	map->buckets->end = map->buckets->max; // fake out expanding it
+	map->default_number_of_buckets = (buckets_number == 0) ? DEFAULT_NUMBER_OF_BUCKETS : buckets_number;
+	map->default_max_load = (max_load == 0) ? DEFAULT_MAX_LOAD : max_load;
 
-	map->buckets_number = DEFAULT_NUMBER_OF_BUCKETS;
+	map->buckets_number = map->default_number_of_buckets;
+
+	map->buckets = DArray_create(sizeof(DArray *), map->default_number_of_buckets);
+	map->buckets->expand_rate = map->default_number_of_buckets;
+	map->buckets->end = map->buckets->max; // fake out expanding it
 
 	map->counter = 0;
 
@@ -60,6 +63,11 @@ error:
 	}
 
 	return NULL;
+}
+
+Hashmap *Hashmap_create(Hashmap_compare compare, Hashmap_hash hash)
+{
+	return Hashmap_create_advanced(compare, hash, 0, 0);
 }
 
 void Hashmap_destroy(Hashmap *map)
@@ -189,18 +197,18 @@ static int Hashmap_move_nodes(Hashmap *map)
 
 static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
 {
-	if(map->counter < DEFAULT_MAX_LOAD) {
+	if(map->counter < map->default_max_load) {
 		return 0;
 	}
 
-	if(!increase_decrease_buckets && map->buckets_number == DEFAULT_NUMBER_OF_BUCKETS) {
+	if(!increase_decrease_buckets && map->buckets_number == map->default_number_of_buckets) {
 		return 0;
 	}
 	
 	// increase number of buckets
 	if(increase_decrease_buckets) {
-		if((map->counter + 1) % DEFAULT_MAX_LOAD == 1) {
-			map->buckets_number += DEFAULT_NUMBER_OF_BUCKETS;
+		if((map->counter + 1) % map->default_max_load == 1) {
+			map->buckets_number += map->default_number_of_buckets;
 
 			DArray_expand(map->buckets);
 			map->buckets->end = map->buckets->max; // fake out expanding it
@@ -211,8 +219,8 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
 		}
 	// decrease number of buckets
 	} else {
-		if(map->counter % DEFAULT_MAX_LOAD == 0) {
-			map->buckets_number -= DEFAULT_NUMBER_OF_BUCKETS;
+		if(map->counter % map->default_max_load == 0) {
+			map->buckets_number -= map->default_number_of_buckets;
 
 			Hashmap_move_nodes(map);
 

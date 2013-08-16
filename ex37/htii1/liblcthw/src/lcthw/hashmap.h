@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <lcthw/darray.h>
 
-#define DEFAULT_NUMBER_OF_BUCKETS 100
+#define DEFAULT_NUMBER_OF_BUCKETS 100UL
 
 #define DEFAULT_MAX_LOAD 1000000UL
 
@@ -13,7 +13,9 @@ typedef uint32_t (*Hashmap_hash)(void *key);
 
 typedef struct Hashmap {
 	DArray *buckets;
-	int buckets_number;
+	uint32_t default_number_of_buckets;
+	uint32_t default_max_load;
+	uint32_t buckets_number;
 	uint32_t counter;	
 	Hashmap_compare compare;
 	Hashmap_hash hash;
@@ -27,6 +29,7 @@ typedef struct HashmapNode {
 
 typedef int (*Hashmap_traverse_cb)(HashmapNode *node);
 
+Hashmap *Hashmap_create_advanced(Hashmap_compare compare, Hashmap_hash hash, uint32_t buckets_number, uint32_t max_load);
 Hashmap *Hashmap_create(Hashmap_compare compare, Hashmap_hash);
 void Hashmap_destroy(Hashmap *map);
 
