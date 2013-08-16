@@ -152,7 +152,7 @@ static int Hashmap_move_nodes(Hashmap *map)
 			for(j = 0; j < DArray_count(bucket); j++) {
 				HashmapNode *node = DArray_get(bucket, j);
 					
-				if(j < DArray_end(bucket) - 1) {
+				if(DArray_count(bucket) != 1) {
 					DArray_set(bucket, j, DArray_last(bucket));
 					DArray_set(bucket, DArray_end(bucket) - 1, node);
 				}
@@ -171,13 +171,6 @@ static int Hashmap_move_nodes(Hashmap *map)
 			}
 		}
 	}
-
-	return 0;
-}
-
-static int Hashmap_remove_sort_buckets(Hashmap *map)
-{
-	int i = 0;
 
 	for(i = 0; i < DArray_count(map->buckets); i++) {
 		DArray *bucket = DArray_get(map->buckets, i);
@@ -199,6 +192,10 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
 	if(map->counter < DEFAULT_MAX_LOAD) {
 		return 0;
 	}
+
+	if(!increase_decrease_buckets && map->buckets_number == DEFAULT_NUMBER_OF_BUCKETS) {
+		return 0;
+	}
 	
 	// increase number of buckets
 	if(increase_decrease_buckets) {
@@ -208,8 +205,7 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
 			DArray_expand(map->buckets);
 			map->buckets->end = map->buckets->max; // fake out expanding it
 	
-			Hashmap_move_nodes(map);		
-			Hashmap_remove_sort_buckets(map);
+			Hashmap_move_nodes(map);
 
 			return map->buckets_number;
 		}
@@ -217,9 +213,8 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
 	} else {
 		if(map->counter % DEFAULT_MAX_LOAD == 0) {
 			map->buckets_number -= DEFAULT_NUMBER_OF_BUCKETS;
-		
+
 			Hashmap_move_nodes(map);
-			Hashmap_remove_sort_buckets(map);
 
 			DArray_contract(map->buckets);
 
