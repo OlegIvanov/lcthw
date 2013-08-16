@@ -80,10 +80,7 @@ void Hashmap_destroy(Hashmap *map)
 			for(i = 0; i < DArray_count(map->buckets); i++) {
 				DArray *bucket = DArray_get(map->buckets, i);
 				if(bucket) {
-					for(j = 0; j < DArray_count(bucket); j++) {
-						free(DArray_get(bucket, j));
-					}
-					DArray_destroy(bucket);
+					DArray_clear_destroy(bucket);
 				}
 			}
 			DArray_destroy(map->buckets);
@@ -206,6 +203,12 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_buckets)
 
 			DArray_expand(map->buckets);
 			map->buckets->end = map->buckets->max; // fake out expanding it
+
+			int i = 0;
+			
+			for(i = DArray_end(map->buckets) - map->default_number_of_buckets; i < DArray_end(map->buckets); i++) {
+				DArray_set(map->buckets, i, NULL);
+			}
 	
 			Hashmap_move_nodes(map);
 
