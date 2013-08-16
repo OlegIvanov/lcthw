@@ -7,7 +7,7 @@ Hashmap *map = NULL;
 static int traverse_called = 0;
 struct tagbstring test1 = bsStatic("test data 1");
 struct tagbstring test2 = bsStatic("test data 2");
-struct tagbstring test3 = bsStatic("xest data 3");
+struct tagbstring test3 = bsStatic("test data 3");
 struct tagbstring expect1 = bsStatic("THE VALUE 1");
 struct tagbstring expect2 = bsStatic("THE VALUE 2");
 struct tagbstring expect3 = bsStatic("THE VALUE 3");
@@ -105,6 +105,42 @@ char *test_delete()
 
 char *test_rehash()
 {
+	Hashmap *map1 = Hashmap_create_advanced(NULL, NULL, 1, 1);
+	
+	// set 1
+	Hashmap_set(map1, &test1, &expect1);
+
+	traverse_called = 0;
+	Hashmap_traverse(map1, traverse_good_cb);
+	mu_assert(traverse_called == 1, "Wrong count traverse.");
+	debug("_______________________________________________");
+
+	// set 2
+	Hashmap_set(map1, &test2, &expect2);
+
+	traverse_called = 0;
+	Hashmap_traverse(map1, traverse_good_cb);
+	mu_assert(traverse_called == 2, "Wrong count traverse.");
+	debug("_______________________________________________");
+
+	// set 3
+	Hashmap_set(map1, &test3, &expect3);
+
+	traverse_called = 0;
+	Hashmap_traverse(map1, traverse_good_cb);
+	mu_assert(traverse_called == 3, "Wrong count traverse.");
+	debug("_______________________________________________");
+
+	// delete 1
+	Hashmap_delete(map1, &test1);
+
+	traverse_called = 0;
+	Hashmap_traverse(map1, traverse_good_cb);
+	mu_assert(traverse_called == 2, "Wrong count traverse.");
+	
+	// destroy
+	Hashmap_destroy(map1);
+
 	return NULL;
 }
 

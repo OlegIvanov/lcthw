@@ -80,10 +80,7 @@ void Hashmap_destroy(Hashmap *map)
 			for(i = 0; i < DArray_count(map->buckets); i++) {
 				DArray *bucket = DArray_get(map->buckets, i);
 				if(bucket) {
-					for(j = 0; j < DArray_count(bucket); i++) {
-						free(DArray_get(bucket, j));
-					}
-					DArray_destroy(bucket);
+					DArray_clear_destroy(bucket);
 				}
 			}
 			DArray_destroy(map->buckets);
