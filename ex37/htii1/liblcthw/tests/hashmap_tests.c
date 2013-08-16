@@ -106,6 +106,8 @@ char *test_delete()
 char *test_rehash()
 {
 	Hashmap *map1 = Hashmap_create_advanced(NULL, NULL, 1, 1);
+
+	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
 	
 	// set 1
 	Hashmap_set(map1, &test1, &expect1);
@@ -113,6 +115,9 @@ char *test_rehash()
 	traverse_called = 0;
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 1, "Wrong count traverse.");
+	
+	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+
 	debug("_______________________________________________");
 
 	// set 2
@@ -121,6 +126,9 @@ char *test_rehash()
 	traverse_called = 0;
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 2, "Wrong count traverse.");
+
+	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+
 	debug("_______________________________________________");
 
 	// set 3
@@ -129,6 +137,9 @@ char *test_rehash()
 	traverse_called = 0;
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 3, "Wrong count traverse.");
+
+	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+
 	debug("_______________________________________________");
 
 	// delete 1
@@ -137,6 +148,8 @@ char *test_rehash()
 	traverse_called = 0;
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 2, "Wrong count traverse.");
+
+	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
 	
 	// destroy
 	Hashmap_destroy(map1);

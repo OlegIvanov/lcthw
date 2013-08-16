@@ -195,18 +195,18 @@ static int Hashmap_move_nodes(Hashmap *map)
 	return 0;
 }
 
-static inline int Hashmap_rehash(Hashmap *map, int increase_decrease_buckets)
+static inline int Hashmap_rehash(Hashmap *map, int increase_buckets)
 {
 	if(map->counter < map->default_max_load) {
 		return 0;
 	}
 
-	if(!increase_decrease_buckets && map->buckets_number == map->default_number_of_buckets) {
+	if(!increase_buckets && map->buckets_number == map->default_number_of_buckets) {
 		return 0;
 	}
 	
 	// increase number of buckets
-	if(increase_decrease_buckets) {
+	if(increase_buckets) {
 		if((map->counter + 1) % map->default_max_load == 1) {
 			map->buckets_number += map->default_number_of_buckets;
 
