@@ -26,6 +26,21 @@ static uint32_t djb2_hash(void *a)
 	return hash;
 }
 
+static int nodes_distribution(Hashmap *map)
+{
+	int i = 0;
+
+	debug("NODES DISTRIBUTION:");
+	for(i = 0; i < DArray_count(map->buckets); i++) {
+		DArray *bucket = DArray_get(map->buckets, i);
+		if(bucket) {
+			debug("BUCKET %d:\t %d nodes", i, DArray_count(bucket));
+		}
+	}
+
+	return 0;
+}
+
 static int traverse_good_cb(HashmapNode *node)
 {
 	debug("KEY: %s", bdata((bstring)node->key));
@@ -76,6 +91,8 @@ char *test_get_set()
 	mu_assert(rc == 0, "Failed to set test3.");
 	result = Hashmap_get(map, &test3);
 	mu_assert(result == &expect3, "Wrong value for test3.");
+
+	nodes_distribution(map);
 
 	return NULL;
 }
@@ -130,6 +147,7 @@ char *test_rehash()
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 1, "Wrong count traverse.");	
 	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+	nodes_distribution(map1);
 	debug("_______________________________________________");
 
 	// set 2
@@ -139,6 +157,7 @@ char *test_rehash()
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 2, "Wrong count traverse.");
 	mu_assert(map1->buckets_number == 2, "Wrong buckets number.");
+	nodes_distribution(map1);
 	debug("_______________________________________________");
 
 	// set 3
@@ -148,6 +167,7 @@ char *test_rehash()
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 3, "Wrong count traverse.");
 	mu_assert(map1->buckets_number == 3, "Wrong buckets number.");
+	nodes_distribution(map1);
 	debug("_______________________________________________");
 
 	// delete 1
@@ -157,7 +177,7 @@ char *test_rehash()
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 2, "Wrong count traverse.");
 	mu_assert(map1->buckets_number == 2, "Wrong buckets number.");
-
+	nodes_distribution(map1);
 	debug("_______________________________________________");
 
 	// delete 2
@@ -167,8 +187,9 @@ char *test_rehash()
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 1, "Wrong count traverse.");
 	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+	nodes_distribution(map1);
 	debug("_______________________________________________");
-
+	
 	// delete 3
 	Hashmap_delete(map1, &test3);
 
@@ -176,6 +197,7 @@ char *test_rehash()
 	Hashmap_traverse(map1, traverse_good_cb);
 	mu_assert(traverse_called == 0, "Wrong count traverse.");
 	mu_assert(map1->buckets_number == 1, "Wrong buckets number.");
+	nodes_distribution(map1);
 	debug("_______________________________________________");
 	
 	// destroy
