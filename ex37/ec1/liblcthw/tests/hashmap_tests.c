@@ -247,7 +247,7 @@ char *filling_defect()
 		mu_assert(map1->buckets_number == i + 1, "Wrong buckets number.");
 	}
 	debug("NUMBER OF NODES: %d", map1->counter);
-	mu_assert(map1->counter == 10, "Wrong number of nodes.");
+	mu_assert(map1->counter == STRINGS_NUMBER, "Wrong number of nodes.");
 	nodes_distribution(map1);
 
 	// part 2
