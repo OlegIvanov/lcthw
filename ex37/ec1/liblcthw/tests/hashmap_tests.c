@@ -226,7 +226,7 @@ static inline bstring generate_string()
 	return bstr;
 }
 
-#define STRINGS_NUMBER 1
+#define STRINGS_NUMBER 1000
 
 char *filling_defect()
 {
