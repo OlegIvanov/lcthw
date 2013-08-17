@@ -207,7 +207,7 @@ char *test_rehash()
 	return NULL;
 }
 
-static inline struct tagbstring *generate_string()
+static inline bstring generate_string()
 {
 	int str_len = rand() % 99 + 1 + 1;
 	char *str = malloc(str_len);
@@ -226,11 +226,11 @@ static inline struct tagbstring *generate_string()
 	return bstr;
 }
 
-#define STRINGS_NUMBER 100
+#define STRINGS_NUMBER 1000
 
 char *filling_defect()
 {
-	struct tagbstring *strings[STRINGS_NUMBER] = {NULL};
+	bstring strings[STRINGS_NUMBER] = {NULL};
 
 	int i = 0;
 
@@ -238,10 +238,9 @@ char *filling_defect()
 		strings[i] = generate_string();
 	}
 
-	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 1);
+	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 1000);
 
 	for(i = 0; i < STRINGS_NUMBER; i++) {
-		debug("%s", bdata(strings[i]));
 		Hashmap_set(map1, strings[i], &expect1);
 	}
 
@@ -269,8 +268,6 @@ char *all_tests()
 	mu_run_test(test_rehash);
 
 	srand(time(NULL));
-	stack_increase();
-
 	mu_run_test(filling_defect);
 
 	return NULL;

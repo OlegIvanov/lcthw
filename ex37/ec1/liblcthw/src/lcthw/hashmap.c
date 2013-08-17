@@ -225,6 +225,10 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_buckets)
 
 int Hashmap_set(Hashmap *map, void *key, void *data)
 {
+	check(map, "map can't be NULL");
+	check(key, "key can't be NULL");
+	check(data, "data can't be NULL");
+
 	uint32_t hash = 0;
 	DArray *bucket = Hashmap_find_bucket(map, key, 1, &hash);
 	check(bucket, "Error can't create bucket.");
@@ -242,7 +246,8 @@ int Hashmap_set(Hashmap *map, void *key, void *data)
 		HashmapNode *node = Hashmap_node_create(hash, key, data);
 		check_mem(node);
 
-		DArray_sort_add(bucket, node, (DArray_compare)map->compare);
+		int rc = DArray_sort_add(bucket, node, (DArray_compare)map->compare);
+		check(rc == 0, "DArray_sort_add failed.");
 
 		map->counter++;
 	} else {
