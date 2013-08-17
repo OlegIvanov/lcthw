@@ -226,7 +226,7 @@ static inline bstring generate_string()
 	return bstr;
 }
 
-#define STRINGS_NUMBER 10
+#define STRINGS_NUMBER 1
 
 char *filling_defect()
 {
@@ -238,7 +238,7 @@ char *filling_defect()
 		strings[i] = generate_string();
 	}
 
-	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 10);
+	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, STRINGS_NUMBER);
 
 	for(i = 0; i < STRINGS_NUMBER; i++) {
 		Hashmap_set(map1, strings[i], &expect1);
