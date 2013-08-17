@@ -201,13 +201,7 @@ static inline int Hashmap_rehash(Hashmap *map, int increase_buckets)
 
 			DArray_expand(map->buckets);
 			map->buckets->end = map->buckets->max; // fake out expanding it
-/*
-			int i = 0;
-			
-			for(i = DArray_end(map->buckets) - map->default_number_of_buckets; i < DArray_end(map->buckets); i++) {
-				DArray_set(map->buckets, i, NULL);
-			}
-*/
+
 			Hashmap_move_nodes(map);
 
 			return map->buckets_number;
