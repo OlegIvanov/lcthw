@@ -226,10 +226,11 @@ static inline bstring generate_string()
 	return bstr;
 }
 
-#define STRINGS_NUMBER 1000
+#define STRINGS_NUMBER 10
 
 char *filling_defect()
 {
+	// part 0
 	bstring strings[STRINGS_NUMBER] = {NULL};
 
 	int i = 0;
@@ -237,17 +238,28 @@ char *filling_defect()
 	for(i = 0; i < STRINGS_NUMBER; i++) {
 		strings[i] = generate_string();
 	}
+	
+	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 1);	
 
-	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 1);
-
+	// part 1
 	for(i = 0; i < STRINGS_NUMBER; i++) {
 		Hashmap_set(map1, strings[i], &expect1);
 	}
-
+	debug("NUMBER OF NODES: %d", map1->counter);
+	mu_assert(map1->counter == 10, "Wrong number of nodes.");
 	nodes_distribution(map1);
 
-	Hashmap_destroy(map1);
+	// part 2
+	for(i = 0; i < STRINGS_NUMBER / 2; i++) {
+		Hashmap_delete(map1, strings[i]);
+	}
+	debug("NUMBER OF NODES: %d", map1->counter);
+	mu_assert(map1->counter == STRINGS_NUMBER / 2, "Wrong number of nodes.");
+	nodes_distribution(map1);
 
+	// part 3
+	Hashmap_destroy(map1);
+	
 	for(i = 0; i < STRINGS_NUMBER; i++) {
 		bdestroy(strings[i]);
 	}
