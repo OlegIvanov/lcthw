@@ -238,7 +238,7 @@ char *filling_defect()
 		strings[i] = generate_string();
 	}
 
-	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, STRINGS_NUMBER);
+	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 1);
 
 	for(i = 0; i < STRINGS_NUMBER; i++) {
 		Hashmap_set(map1, strings[i], &expect1);
