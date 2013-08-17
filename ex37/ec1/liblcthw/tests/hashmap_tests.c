@@ -252,6 +252,7 @@ char *filling_defect()
 	// part 2
 	for(i = 0; i < STRINGS_NUMBER / 2; i++) {
 		Hashmap_delete(map1, strings[i]);
+		mu_assert(map1->buckets_number == STRINGS_NUMBER - i - 1, "Wrong buckets number.");
 	}
 	debug("NUMBER OF NODES: %d", map1->counter);
 	mu_assert(map1->counter == STRINGS_NUMBER / 2, "Wrong number of nodes.");
