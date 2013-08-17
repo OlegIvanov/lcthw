@@ -73,7 +73,6 @@ Hashmap *Hashmap_create(Hashmap_compare compare, Hashmap_hash hash)
 void Hashmap_destroy(Hashmap *map)
 {
 	int i = 0;
-	int j = 0;
 
 	if(map) {
 		if(map->buckets) {	
