@@ -177,9 +177,14 @@ static int Hashmap_move_nodes(Hashmap *map)
 			if(DArray_count(bucket) == 0) {
 				DArray_destroy(bucket);
 				DArray_remove(map->buckets, i);
-			} else {
-				DArray_heapsort(bucket, (DArray_compare)map->compare);
 			}
+		}
+	}
+
+	for(i = 0; i < DArray_count(map->buckets); i++) {
+		DArray *bucket = DArray_get(map->buckets, i);
+		if(bucket) {
+			DArray_heapsort(bucket, (DArray_compare)map->compare);
 		}
 	}
 
