@@ -150,34 +150,22 @@ static int Hashmap_move_nodes(Hashmap *map)
 	int i = 0;
 	int j = 0;
 	uint32_t hash = 0;
+	DArray *new_bucket = NULL;
 
 	for(i = 0; i < DArray_count(map->buckets); i++) {
 		DArray *bucket = DArray_get(map->buckets, i);
 		if(bucket) {
+			DArray_remove(map->buckets, i);
+
 			for(j = 0; j < DArray_count(bucket); j++) {
 				HashmapNode *node = DArray_get(bucket, j);
-					
-				if(DArray_count(bucket) != 1) {
-					DArray_set(bucket, j, DArray_last(bucket));
-					DArray_set(bucket, DArray_end(bucket) - 1, node);
-				}
 
-				DArray_pop(bucket);
-
-				DArray *new_bucket = Hashmap_find_bucket(map, node->key, 1, &hash);
+				new_bucket = Hashmap_find_bucket(map, node->key, 1, &hash);
 
 				DArray_push(new_bucket, node);
 			}
-		}
-	}
 
-	for(i = 0; i < DArray_count(map->buckets); i++) {
-		DArray *bucket = DArray_get(map->buckets, i);
-		if(bucket) {
-			if(DArray_count(bucket) == 0) {
-				DArray_destroy(bucket);
-				DArray_remove(map->buckets, i);
-			}
+			DArray_destroy(bucket);
 		}
 	}
 
