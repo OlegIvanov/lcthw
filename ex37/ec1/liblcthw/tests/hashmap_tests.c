@@ -245,21 +245,27 @@ char *filling_defect()
 	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 1);	
 
 	// part 1
+	debug("PART 1");
 	for(i = 0; i < STRINGS_NUMBER; i++) {
 		Hashmap_set(map1, keys[i], values[i]);
 		mu_assert(map1->buckets_number == i + 1, "Wrong buckets number.");
+
+		result = Hashmap_get(map1, keys[i]);
+		mu_assert(result == values[i], "Wrong value.");
 	}
 	debug("NUMBER OF NODES: %d", map1->counter);
 	mu_assert(map1->counter == STRINGS_NUMBER, "Wrong number of nodes.");
 	nodes_distribution(map1);
 
 	// part 2
+	debug("PART 2");
 	for(i = 0; i < STRINGS_NUMBER; i++) {
 		result = Hashmap_get(map1, keys[i]);
 		mu_assert(result == values[i], "Wrong value.");
 	}
 
 	// part 3
+	debug("PART 3");
 	for(i = 0; i < STRINGS_NUMBER / 2; i++) {
 		Hashmap_delete(map1, keys[i]);
 		mu_assert(map1->buckets_number == STRINGS_NUMBER - i - 1, "Wrong buckets number.");
