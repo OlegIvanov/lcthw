@@ -231,19 +231,22 @@ static inline bstring generate_string()
 char *filling_defect()
 {
 	// part 0
-	bstring strings[STRINGS_NUMBER] = {NULL};
+	bstring keys[STRINGS_NUMBER] = {NULL};
+	bstring values[STRINGS_NUMBER] = {NULL};
+	bstring result = NULL;
 
 	int i = 0;
 
 	for(i = 0; i < STRINGS_NUMBER; i++) {
-		strings[i] = generate_string();
+		keys[i] = generate_string();
+		values[i] = generate_string();
 	}
 	
 	Hashmap *map1 = Hashmap_create_advanced(NULL, djb2_hash, 1, 1);	
 
 	// part 1
 	for(i = 0; i < STRINGS_NUMBER; i++) {
-		Hashmap_set(map1, strings[i], &expect1);
+		Hashmap_set(map1, keys[i], values[i]);
 		mu_assert(map1->buckets_number == i + 1, "Wrong buckets number.");
 	}
 	debug("NUMBER OF NODES: %d", map1->counter);
@@ -251,19 +254,26 @@ char *filling_defect()
 	nodes_distribution(map1);
 
 	// part 2
+	for(i = 0; i < STRINGS_NUMBER; i++) {
+		result = Hashmap_get(map1, keys[i]);
+		mu_assert(result == values[i], "Wrong value.");
+	}
+
+	// part 3
 	for(i = 0; i < STRINGS_NUMBER / 2; i++) {
-		Hashmap_delete(map1, strings[i]);
+		Hashmap_delete(map1, keys[i]);
 		mu_assert(map1->buckets_number == STRINGS_NUMBER - i - 1, "Wrong buckets number.");
 	}
 	debug("NUMBER OF NODES: %d", map1->counter);
 	mu_assert(map1->counter == STRINGS_NUMBER / 2, "Wrong number of nodes.");
 	nodes_distribution(map1);
 
-	// part 3
+	// part 4
 	Hashmap_destroy(map1);
 	
 	for(i = 0; i < STRINGS_NUMBER; i++) {
-		bdestroy(strings[i]);
+		bdestroy(keys[i]);
+		bdestroy(values[i]);
 	}
 
 	return NULL;
