@@ -109,7 +109,7 @@ char *test_distribution()
 	int i = 0;
 	int stats[3][BUCKETS] = {{0}};
 
-	DArray *keys = DArray_create(0, NUM_KEYS);
+	DArray *keys = DArray_create(sizeof(100), NUM_KEYS);
 
 	mu_assert(gen_keys(keys, NUM_KEYS) == 0, "Failed to generate random keys.");
 
@@ -120,7 +120,7 @@ char *test_distribution()
 	fprintf(stderr, "FNV\tA32\tDJB\n");
 
 	for(i = 0; i < BUCKETS; i++) {
-		fprintf(stderr, "%d\t%d\t\n",
+		fprintf(stderr, "%d\t%d\t%d\n",
 				stats[ALGO_FNV1A][i],
 				stats[ALGO_ADLER32][i],
 				stats[ALGO_DJB][i]);
