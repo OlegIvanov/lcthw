@@ -1,5 +1,5 @@
-#ifndef _perfomance_routines_h
-#define _perfomance_routines_h
+#ifndef _tests_routines_h
+#define _tests_routines_h
 
 #include <stdint.h>
 #include <time.h>
