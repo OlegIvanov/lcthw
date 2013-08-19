@@ -90,7 +90,7 @@ static inline void StringScanner_set_needle(StringScanner *scan, bstring tofind)
 
 static inline void StringScanner_reset(StringScanner *scan)
 {
-	skan->haystack = (const unsigned char *)bdata(scan->in);
+	scan->haystack = (const unsigned char *)bdata(scan->in);
 	scan->hlen = blength(scan->in);
 }
 
