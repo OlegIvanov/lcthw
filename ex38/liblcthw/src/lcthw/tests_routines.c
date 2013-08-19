@@ -1,4 +1,4 @@
-#include <lcthw/perfomance_routines.h>
+#include <lcthw/tests_routines.h>
 #include <time.h>
 #include <stdint.h>
 #include <stdio.h>
