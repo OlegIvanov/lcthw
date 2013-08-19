@@ -53,7 +53,7 @@ char *test_djb()
 #define BUCKETS 100
 #define BUFFER_LEN 20
 #define NUM_KEYS BUCKETS * 1000
-enum {ALGO_FNV1A, ALGO_ADLER32, ALGO_DJB};
+enum {ALGO_FNV1A, ALGO_ADLER32, ALGO_DJB, ALGO_LOSE};
 
 int gen_keys(DArray *keys, int num_keys)
 {
@@ -107,7 +107,7 @@ void fill_distribution(int *stats, DArray *keys, Hashmap_hash hash_func)
 char *test_distribution()
 {
 	int i = 0;
-	int stats[3][BUCKETS] = {{0}};
+	int stats[4][BUCKETS] = {{0}};
 
 	DArray *keys = DArray_create(sizeof(100), NUM_KEYS);
 
@@ -116,14 +116,16 @@ char *test_distribution()
 	fill_distribution(stats[ALGO_FNV1A], keys, Hashmap_fnv1a_hash);
 	fill_distribution(stats[ALGO_ADLER32], keys, Hashmap_adler32_hash);
 	fill_distribution(stats[ALGO_DJB], keys, Hashmap_djb_hash);
+	fill_distribution(stats[ALGO_LOSE], keys, Hashmap_loselose_hash);
 
-	fprintf(stderr, "FNV\tA32\tDJB\n");
+	fprintf(stderr, "FNV\tA32\tDJB\tLOSE\n");
 
 	for(i = 0; i < BUCKETS; i++) {
-		fprintf(stderr, "%d\t%d\t%d\n",
+		fprintf(stderr, "%d\t%d\t%d\t%d\n",
 				stats[ALGO_FNV1A][i],
 				stats[ALGO_ADLER32][i],
-				stats[ALGO_DJB][i]);
+				stats[ALGO_DJB][i],
+				stats[ALGO_LOSE][i]);
 	}
 
 	destroy_keys(keys);

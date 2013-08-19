@@ -49,3 +49,18 @@ uint32_t Hashmap_djb_hash(void *data)
 
 	return hash;
 }
+
+// Bad hash function that gives too big range.
+// To improve it just increase size of hash variable.
+uint32_t Hashmap_loselose_hash(void *data)
+{
+	bstring s = (bstring)data;
+	uint8_t hash = 0;
+	int i = 0;
+
+	for(i = 0; i < blength(s); i++) {
+		hash += bchare(s, i, 0);
+	}
+
+	return hash;
+}
