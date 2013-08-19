@@ -8,4 +8,5 @@
 !DEPENDS
 !README.md
 !LICENSE
+!*.txt
 !.gitignore
