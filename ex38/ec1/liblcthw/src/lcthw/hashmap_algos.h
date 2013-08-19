@@ -9,6 +9,8 @@ uint32_t Hashmap_adler32_hash(void *data);
 
 uint32_t Hashmap_djb_hash(void *data);
 
+uint32_t default_hash(void *data);
+
 uint32_t Hashmap_loselose_hash(void *data);
 
 #endif

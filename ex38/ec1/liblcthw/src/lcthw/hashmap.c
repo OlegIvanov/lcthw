@@ -4,34 +4,11 @@
 #include <lcthw/dbg.h>
 #include <lcthw/bstrlib.h>
 #include <lcthw/darray_algos.h>
+#include <lcthw/hashmap_algos.h>
 
 static int default_compare(void **a, void **b) 
 {
 	return bstrcmp((bstring)((HashmapNode *)*a)->key, (bstring)((HashmapNode *)*b)->key);
-}
-
-/**
- * Simple Bob Jenkins's hash algorithm taken from the
- * wikipedia description
- */
-static uint32_t default_hash(void *a)
-{
-	size_t len = blength((bstring)a);
-	char *key = bdata((bstring)a);
-	uint32_t hash = 0;
-	uint32_t i = 0;
-
-	for(hash = i = 0; i < len; ++i) {
-		hash += key[i];
-		hash += (hash << 10);
-		hash ^= (hash >> 6);
-	}
-	
-	hash += (hash << 3);
-	hash ^= (hash >> 11);
-	hash += (hash << 15);
-
-	return hash;
 }
 
 Hashmap *Hashmap_create_advanced(Hashmap_compare compare, Hashmap_hash hash, uint32_t buckets_number, uint32_t max_load)

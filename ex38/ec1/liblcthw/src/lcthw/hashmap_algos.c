@@ -50,6 +50,30 @@ uint32_t Hashmap_djb_hash(void *data)
 	return hash;
 }
 
+/**
+ * Simple Bob Jenkins's hash algorithm taken from the
+ * wikipedia description
+ */
+uint32_t default_hash(void *data)
+{
+	size_t len = blength((bstring)data);
+	char *key = bdata((bstring)data);
+	uint32_t hash = 0;
+	uint32_t i = 0;
+
+	for(hash = i = 0; i < len; ++i) {
+		hash += key[i];
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+	}
+	
+	hash += (hash << 3);
+	hash ^= (hash >> 11);
+	hash += (hash << 15);
+
+	return hash;
+}
+
 // Bad hash function that gives too big range.
 // To improve it just increase size of hash variable.
 uint32_t Hashmap_loselose_hash(void *data)
