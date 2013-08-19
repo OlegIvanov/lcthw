@@ -88,3 +88,16 @@ uint32_t Hashmap_loselose_hash(void *data)
 
 	return hash;
 }
+
+uint32_t Hashmap_sdbm_hash(void *data)
+{
+	bstring s = (bstring)data;
+	uint32_t hash = 0;
+	int i = 0;
+
+	for(i = 0; i < blength(s); i++) {
+		hash = bchare(s, i, 0) + (hash << 6) + (hash << 16) - hash;
+	}
+
+	return hash;
+}

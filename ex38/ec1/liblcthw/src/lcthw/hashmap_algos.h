@@ -13,4 +13,6 @@ uint32_t default_hash(void *data);
 
 uint32_t Hashmap_loselose_hash(void *data);
 
+uint32_t Hashmap_sdbm_hash(void *data);
+
 #endif
