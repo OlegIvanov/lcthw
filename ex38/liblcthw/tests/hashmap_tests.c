@@ -2,7 +2,6 @@
 #include <lcthw/hashmap.h>
 #include <assert.h>
 #include <lcthw/bstrlib.h>
-#include <lcthw/perfomance_routines.h>
 
 Hashmap *map = NULL;
 static int traverse_called = 0;
