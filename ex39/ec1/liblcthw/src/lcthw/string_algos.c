@@ -48,6 +48,8 @@ error: // fallthrough
 
 int String_find(bstring in, bstring what, int reset)
 {
+	const unsigned char *found = NULL;
+
 	static const unsigned char *haystack = NULL;
 	static ssize_t hlen = 0;
 	
@@ -56,16 +58,25 @@ int String_find(bstring in, bstring what, int reset)
 	
 	static size_t skip_chars[UCHAR_MAX + 1] = {0};
 
-	static ssize_t found_at = -1;
+	static ssize_t found_at = 0;
 
-	if(reset || found_at == -1 || hlen <= 0) {
+	if(reset) {
+		found_at = 0;
+
 		haystack = (const unsigned char *)bdata(in);
 		hlen = blength(in);
 
 		String_setup_skip_chars(skip_chars, needle, nlen);
 	}
 
-	const unsigned char *found = String_base_search(haystack, hlen, needle, nlen, skip_chars);
+	if(found_at != 0 && hlen <= 0) {
+		haystack = (const unsigned char *)bdata(in);
+		hlen = blength(in);
+
+		return -1;
+	}
+
+	found = String_base_search(haystack, hlen, needle, nlen, skip_chars);
 
 	if(found) {
 		found_at = found - (const unsigned char *)bdata(in);

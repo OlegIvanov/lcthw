@@ -114,7 +114,7 @@ char *test_find_improved()
 	StringScanner *scan = StringScanner_create(&IN_STR);
 	mu_assert(scan != NULL, "Failed to make the scanner.");
 
-	// test1
+	// test 1
 	int scan_i = StringScanner_scan(scan, &ALPHA);
 	debug("scan_i: %d", scan_i);
 	mu_assert(scan_i > 0, "Failed to find 'ALPHA' with scan.");
@@ -123,7 +123,7 @@ char *test_find_improved()
 	debug("find_i: %d", find_i);
 	mu_assert(find_i == scan_i, "find and scan don't match");
 
-	// test2
+	// test 2
 	scan_i = StringScanner_scan(scan, &ALPHA);
 	debug("scan_i: %d", scan_i);
 	mu_assert(scan_i > 0, "Failed to find 'ALPHA' with scan.");
@@ -132,7 +132,7 @@ char *test_find_improved()
 	debug("find_i: %d", find_i);
 	mu_assert(find_i == scan_i, "find and scan don't match");
 
-	// test3
+	// test 3
 	scan_i = StringScanner_scan(scan, &ALPHA);
 	debug("scan_i: %d", scan_i);
 	mu_assert(scan_i > 0, "Failed to find 'ALPHA' with scan.");
@@ -141,7 +141,25 @@ char *test_find_improved()
 	debug("find_i: %d", find_i);
 	mu_assert(find_i == scan_i, "find and scan don't match");
 
-	// test4
+	// test 4
+	scan_i = StringScanner_scan(scan, &ALPHA);
+	debug("scan_i: %d", scan_i);
+	mu_assert(scan_i == -1, "shouldn't find it");
+
+	find_i = String_find(&IN_STR, &ALPHA, 0);
+	debug("find_i: %d", find_i);
+	mu_assert(find_i == -1, "shouldn't find it");
+
+	// test 5
+	scan_i = StringScanner_scan(scan, &ALPHA);
+	debug("scan_i: %d", scan_i);
+	mu_assert(scan_i > 0, "Failed to find 'ALPHA' with scan.");
+
+	find_i = String_find(&IN_STR, &ALPHA, 0);
+	debug("find_i: %d", find_i);
+	mu_assert(find_i == scan_i, "find and scan don't match");
+
+	// test 6
 	StringScanner_destroy(scan);
 
 	return NULL;
