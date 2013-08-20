@@ -12,7 +12,7 @@ char *test_find_and_scan()
 	StringScanner *scan = StringScanner_create(&IN_STR);
 	mu_assert(scan != NULL, "Failed to make the scanner.");
 
-	int find_i = String_find(&IN_STR, &ALPHA);
+	int find_i = String_find(&IN_STR, &ALPHA, 1);
 	mu_assert(find_i > 0, "Failed to find 'ALPHA' in test string.");
 
 	int scan_i = StringScanner_scan(scan, &ALPHA);
@@ -65,7 +65,7 @@ char *test_find_perfomance()
 
 	do {
 		for(i = 0; i < 1000; i++) {
-			found_at = String_find(&IN_STR, &ALPHA);
+			found_at = String_find(&IN_STR, &ALPHA, 0);
 			find_count++;
 		}
 	
@@ -109,11 +109,50 @@ char *test_scan_perfomance()
 	return NULL;
 }
 
+char *test_find_improved()
+{
+	StringScanner *scan = StringScanner_create(&IN_STR);
+	mu_assert(scan != NULL, "Failed to make the scanner.");
+
+	// test1
+	int scan_i = StringScanner_scan(scan, &ALPHA);
+	debug("scan_i: %d", scan_i);
+	mu_assert(scan_i > 0, "Failed to find 'ALPHA' with scan.");
+
+	int find_i = String_find(&IN_STR, &ALPHA, 1);
+	debug("find_i: %d", find_i);
+	mu_assert(find_i == scan_i, "find and scan don't match");
+
+	// test2
+	scan_i = StringScanner_scan(scan, &ALPHA);
+	debug("scan_i: %d", scan_i);
+	mu_assert(scan_i > 0, "Failed to find 'ALPHA' with scan.");
+
+	find_i = String_find(&IN_STR, &ALPHA, 0);
+	debug("find_i: %d", find_i);
+	mu_assert(find_i == scan_i, "find and scan don't match");
+
+	// test3
+	scan_i = StringScanner_scan(scan, &ALPHA);
+	debug("scan_i: %d", scan_i);
+	mu_assert(scan_i > 0, "Failed to find 'ALPHA' with scan.");
+
+	find_i = String_find(&IN_STR, &ALPHA, 0);
+	debug("find_i: %d", find_i);
+	mu_assert(find_i == scan_i, "find and scan don't match");
+
+	// test4
+	StringScanner_destroy(scan);
+
+	return NULL;
+}
+
 char *all_tests()
 {
 	mu_suite_start();
 
 	mu_run_test(test_find_and_scan);
+	mu_run_test(test_find_improved);
 
 	// this is an idiom for commenting out sections of code
 //#if 0

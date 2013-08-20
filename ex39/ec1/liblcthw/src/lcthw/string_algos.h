@@ -13,7 +13,7 @@ typedef struct StringScanner {
 	size_t skip_chars[UCHAR_MAX + 1];
 } StringScanner;
 
-int String_find(bstring in, bstring what);
+int String_find(bstring in, bstring what, int reset);
 
 StringScanner *StringScanner_create(bstring in);
 

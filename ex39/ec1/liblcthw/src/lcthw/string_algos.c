@@ -46,21 +46,36 @@ error: // fallthrough
 	return NULL;
 }
 
-int String_find(bstring in, bstring what)
+int String_find(bstring in, bstring what, int reset)
 {
-	const unsigned char *found = NULL;
+	static const unsigned char *haystack = NULL;
+	static ssize_t hlen = 0;
 	
-	const unsigned char *haystack = (const unsigned char *)bdata(in);
-	ssize_t hlen = blength(in);
 	const unsigned char *needle = (const unsigned char *)bdata(what);
 	ssize_t nlen = blength(what);
-	size_t skip_chars[UCHAR_MAX + 1] = {0};
+	
+	static size_t skip_chars[UCHAR_MAX + 1] = {0};
 
-	String_setup_skip_chars(skip_chars, needle, nlen);
+	static ssize_t found_at = -1;
 
-	found = String_base_search(haystack, hlen, needle, nlen, skip_chars);
+	if(reset || found_at == -1 || hlen <= 0) {
+		haystack = (const unsigned char *)bdata(in);
+		hlen = blength(in);
 
-	return found != NULL ? found - haystack : -1;
+		String_setup_skip_chars(skip_chars, needle, nlen);
+	}
+
+	const unsigned char *found = String_base_search(haystack, hlen, needle, nlen, skip_chars);
+
+	if(found) {
+		found_at = found - (const unsigned char *)bdata(in);
+		haystack = found + nlen;
+		hlen -= found_at - nlen;
+	} else {
+		found_at = -1;
+	}
+
+	return found_at;
 }
 
 StringScanner *StringScanner_create(bstring in)
