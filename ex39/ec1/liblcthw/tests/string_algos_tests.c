@@ -8,6 +8,23 @@ struct tagbstring ALPHA = bsStatic("ALPHA");
 struct tagbstring have = bsStatic("have");
 const int TEST_TIME = 9;
 
+#define RANDOM_STRING_COUNT 100000
+
+char *test_randomize_string()
+{
+	struct bstrList *random_strings = bsplit(&IN_STR, 'a');
+
+	int i = 0;
+
+	for(i = 0; i < random_strings->qty; i++) {
+		debug("%s", bdata(random_strings->entry[i]));
+	}
+
+	bstrListDestroy(random_strings);
+	
+	return NULL;
+}
+
 char *test_find_and_scan()
 {
 	StringScanner *scan = StringScanner_create(&IN_STR);
@@ -204,11 +221,13 @@ char *all_tests()
 	mu_run_test(test_find_improved);
 
 	// this is an idiom for commenting out sections of code
-//#if 0
+#if 0
 	mu_run_test(test_scan_perfomance);
 	mu_run_test(test_find_perfomance);
 	mu_run_test(test_binstr_perfomance);
-//#endif
+#endif
+
+	mu_run_test(test_randomize_string);
 
 	return NULL;
 }
