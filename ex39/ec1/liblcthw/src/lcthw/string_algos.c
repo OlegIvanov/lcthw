@@ -48,29 +48,44 @@ error: // fallthrough
 
 int String_find(bstring in, bstring what, int reset)
 {
+	static const unsigned char *prev_in = NULL;
+	static const unsigned char *prev_what = NULL;
+
+	const unsigned char *cur_in = (const unsigned char *)bdata(in);
+	const unsigned char *cur_what = (const unsigned char *)bdata(what);
+
 	const unsigned char *found = NULL;
 
 	static const unsigned char *haystack = NULL;
 	static ssize_t hlen = 0;
 	
-	const unsigned char *needle = (const unsigned char *)bdata(what);
+	const unsigned char *needle = cur_what;
 	ssize_t nlen = blength(what);
 	
 	static size_t skip_chars[UCHAR_MAX + 1] = {0};
 
 	static ssize_t found_at = 0;
 
+	if(!prev_in && !prev_what) {
+		prev_in = cur_in;
+		prev_what = cur_what;
+	}
+
+	if(cur_in != prev_in || cur_what != prev_what) {
+		reset = 1;
+	}
+
 	if(reset) {
 		found_at = 0;
 
-		haystack = (const unsigned char *)bdata(in);
+		haystack = cur_in;
 		hlen = blength(in);
 
 		String_setup_skip_chars(skip_chars, needle, nlen);
 	}
 
 	if(found_at != 0 && hlen <= 0) {
-		haystack = (const unsigned char *)bdata(in);
+		haystack = cur_in;
 		hlen = blength(in);
 
 		return -1;
@@ -79,7 +94,7 @@ int String_find(bstring in, bstring what, int reset)
 	found = String_base_search(haystack, hlen, needle, nlen, skip_chars);
 
 	if(found) {
-		found_at = found - (const unsigned char *)bdata(in);
+		found_at = found - cur_in;
 		haystack = found + nlen;
 		hlen -= found_at - nlen;
 	} else {
