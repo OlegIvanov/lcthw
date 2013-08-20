@@ -71,11 +71,7 @@ int String_find(bstring in, bstring what, int reset)
 		prev_what = cur_what;
 	}
 
-	if(cur_in != prev_in || cur_what != prev_what) {
-		reset = 1; // it's not error, we really set flag to execute next statement body
-	}
-
-	if(reset) {
+	if(reset || (cur_in != prev_in || cur_what != prev_what)) {
 		found_at = 0;
 
 		haystack = cur_in;
