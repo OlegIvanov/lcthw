@@ -5,6 +5,7 @@
 
 struct tagbstring IN_STR = bsStatic("I have ALPHA beta ALPHA and oranges ALPHA");
 struct tagbstring ALPHA = bsStatic("ALPHA");
+struct tagbstring have = bsStatic("have");
 const int TEST_TIME = 9;
 
 char *test_find_and_scan()
@@ -160,6 +161,11 @@ char *test_find_improved()
 	mu_assert(find_i == scan_i, "find and scan don't match");
 
 	// test 6
+	find_i = String_find(&IN_STR, &have, 0);
+	debug("find_i: %d", find_i);
+	mu_assert(find_i == 2, "find works right even if we don't reset it");
+
+	// test 7
 	StringScanner_destroy(scan);
 
 	return NULL;

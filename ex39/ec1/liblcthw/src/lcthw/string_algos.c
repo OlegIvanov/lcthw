@@ -72,7 +72,7 @@ int String_find(bstring in, bstring what, int reset)
 	}
 
 	if(cur_in != prev_in || cur_what != prev_what) {
-		reset = 1;
+		reset = 1; // it's not error, we really set flag to execute next statement body
 	}
 
 	if(reset) {
