@@ -116,7 +116,7 @@ int StringScanner_scan(StringScanner *scan, bstring tofind)
 	if(found) {
 		found_at = found - (const unsigned char *)bdata(scan->in);
 		scan->haystack = found + scan->nlen;
-		scan->hlen = found_at - scan->nlen;
+		scan->hlen -= found_at - scan->nlen;
 	} else {
 		// done, reset the setup
 		StringScanner_reset(scan);
