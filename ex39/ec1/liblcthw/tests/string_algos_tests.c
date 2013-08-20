@@ -33,7 +33,7 @@ char *test_find_and_scan()
 	return NULL;
 }
 
-//#define SHORT_BURST
+#define SHORT_BURST
 
 char *test_binstr_perfomance()
 {
