@@ -33,12 +33,22 @@ char *test_find_and_scan()
 	return NULL;
 }
 
+//#define SHORT_BURST
+
 char *test_binstr_perfomance()
 {
 	int i = 0;
 	int found_at = 0;
 	unsigned long find_count = 0;
 	time_t elapsed = 0;
+
+#ifdef SHORT_BURST
+	debug("short burst");
+	for(i = 0; i < 1000; i++) {
+		found_at = binstr(&IN_STR, 0, &ALPHA);
+	}
+#endif
+
 	time_t start = time(NULL);
 
 	do {
@@ -62,6 +72,14 @@ char *test_find_perfomance()
 	int found_at = 0;
 	unsigned long find_count = 0;
 	time_t elapsed = 0;
+
+#ifdef SHORT_BURST
+	debug("short burst");
+	for(i = 0; i < 1000; i++) {
+		found_at = String_find(&IN_STR, &ALPHA, 0);
+	}
+#endif
+
 	time_t start = time(NULL);
 
 	do {
@@ -86,6 +104,13 @@ char *test_scan_perfomance()
 	unsigned long find_count = 0;
 	time_t elapsed = 0;
 	StringScanner *scan = StringScanner_create(&IN_STR);
+
+#ifdef SHORT_BURST
+	debug("short burst");
+	for(i = 0; i < 1000; i++) {
+		found_at = StringScanner_scan(scan, &ALPHA);
+	}
+#endif
 
 	time_t start = time(NULL);
 
