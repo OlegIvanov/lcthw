@@ -8,8 +8,6 @@ struct tagbstring ALPHA = bsStatic("ALPHA");
 struct tagbstring have = bsStatic("have");
 const int TEST_TIME = 9;
 
-#define RANDOM_STRING_COUNT 100000
-
 char *test_randomize_string()
 {
 	struct bstrList *random_strings = bsplit(&IN_STR, 'a');
