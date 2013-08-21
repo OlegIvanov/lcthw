@@ -37,6 +37,11 @@ $(TESTS): %_tests: %_tests.c $(TARGET)
 tests:
 	sh ./tests/runtests.sh
 
+# Getting callgrind and cachegrind out files
+.PHONY: perf_tun
+perf_tun:
+	sh ./tests/perf_tun.sh
+
 valgrind:
 	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE)
 
