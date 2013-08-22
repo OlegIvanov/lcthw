@@ -2,6 +2,7 @@
 #include <lcthw/bstree.h>
 #include <stdlib.h>
 #include <lcthw/bstrlib.h>
+#include <lcthw/hashmap_algos.h>
 
 char BSTREE_ERROR;
 
@@ -10,12 +11,13 @@ static int default_compare(void *a, void *b)
 	return bstrcmp((bstring)a, (bstring)b);
 }
 
-BSTree *BSTree_create(BSTree_compare compare)
+BSTree *BSTree_create(BSTree_compare compare, Hashmap_hash hash_func)
 {
 	BSTree *map = calloc(1, sizeof(BSTree));
 	check_mem(map);
 
 	map->compare = compare == NULL ? default_compare : compare;
+	map->hash_func = hash_func == NULL ? Hashmap_djb_hash : hash_func;
 
 	return map;
 
@@ -40,7 +42,7 @@ void BSTree_destroy(BSTree *map)
 	}
 }
 
-static inline BSTreeNode *BSTreeNode_create(BSTreeNode *parent, void *key, void *data)
+static inline BSTreeNode *BSTreeNode_create(BSTree *map, BSTreeNode *parent, void *key, void *data)
 {
 	check(key, "key can't be NULL");
 
@@ -49,6 +51,7 @@ static inline BSTreeNode *BSTreeNode_create(BSTreeNode *parent, void *key, void 
 
 	node->key = key;
 	node->data = data;
+	node->hash = map->hash_func(node->key);
 	node->parent = parent;
 	return node;
 
@@ -68,13 +71,13 @@ static inline int BSTree_setnode(BSTree *map, BSTreeNode *node, void *key, void 
 		if(node->left) {
 			BSTree_setnode(map, node->left, key, data);
 		} else {
-			node->left = BSTreeNode_create(node, key, data);
+			node->left = BSTreeNode_create(map, node, key, data);
 		}
 	} else {
 		if(node->right) {
 			BSTree_setnode(map, node->right, key, data);
 		} else {
-			node->right = BSTreeNode_create(node, key, data);
+			node->right = BSTreeNode_create(map, node, key, data);
 		}
 	}
 	
@@ -89,11 +92,14 @@ int BSTree_set(BSTree *map, void *key, void *data)
 	check(map, "map can't be NULL");
 	check(key, "key can't be NULL");
 
+	uint32_t hash = 0;
+
 	if(map->root == NULL) {
 		// first so just make it and get out
-		map->root = BSTreeNode_create(NULL, key, data);
+		map->root = BSTreeNode_create(map, NULL, key, data);
 		check_mem(map->root);
 	} else {
+		hash = map->hash_func(key);
 		BSTree_setnode(map, map->root, key, data);
 	}
 
@@ -135,9 +141,12 @@ void *BSTree_get(BSTree *map, void *key)
 	check(map, "map can't be NULL");
 	check(key, "key can't be NULL");
 
+	uint32_t hash = 0;
+
 	if(map->root == NULL) {
 		return NULL;
 	} else {
+		hash = map->hash_func(key);
 		BSTreeNode *node = BSTree_getnode(map, map->root, key);
 		return node == NULL ? NULL : node->data;
 	}
@@ -215,7 +224,10 @@ static inline void BSTree_swap(BSTreeNode *a, BSTreeNode *b)
 {
 	void *temp = NULL;
 	temp = b->key; b->key = a->key; a->key = temp;
-	temp = b->data; b->data = a->data; a->data = temp;	
+	temp = b->data; b->data = a->data; a->data = temp;
+
+	uint32_t temp_hash = 0;
+	temp_hash = b->hash; b->hash = a->hash; a->hash = temp_hash;
 }
 
 static inline BSTreeNode *BSTree_node_delete(BSTree *map, BSTreeNode *node, void *key)
@@ -279,5 +291,5 @@ void *BSTree_delete(BSTree *map, void *key)
 	return data;
 
 error:
-	return NULL;
+	return BSTREE_ERROR_POINTER;
 }

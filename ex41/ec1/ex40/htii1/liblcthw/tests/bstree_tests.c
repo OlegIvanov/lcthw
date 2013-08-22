@@ -35,7 +35,7 @@ static int traverse_fail_cb(BSTreeNode *node)
 
 char *test_create()
 {
-	map = BSTree_create(NULL);
+	map = BSTree_create(NULL, NULL);
 	mu_assert(map != NULL, "Failed to create map.");
 
 	return NULL;
@@ -114,7 +114,7 @@ char *test_delete()
 
 char *test_fuzzing()
 {
-	BSTree *store = BSTree_create(NULL);
+	BSTree *store = BSTree_create(NULL, NULL);
 	int i = 0;
 	int j = 0;
 	bstring numbers[100] = {NULL};
