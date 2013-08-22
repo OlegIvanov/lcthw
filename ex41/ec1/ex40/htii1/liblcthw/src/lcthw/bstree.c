@@ -57,6 +57,7 @@ static inline int BSTree_setnode(BSTree *map, BSTreeNode *node, void *key, void 
 {
 	check(map, "map can't be NULL");
 	check(node, "node can't be NULL");
+	check(key, "key can't be NULL");
 
 	int cmp = map->compare(node->key, key);
 	
@@ -83,6 +84,7 @@ error:
 int BSTree_set(BSTree *map, void *key, void *data)
 {
 	check(map, "map can't be NULL");
+	check(key, "key can't be NULL");
 
 	if(map->root == NULL) {
 		// first so just make it and get out
@@ -100,6 +102,8 @@ error:
 static inline BSTreeNode *BSTree_getnode(BSTree *map, BSTreeNode *node, void *key)
 {
 	check(map, "map can't be NULL");
+	check(node, "node can't be NULL");
+	check(key, "key can't be NULL");
 
 	int cmp = map->compare(node->key, key);
 
@@ -125,12 +129,18 @@ error:
 
 void *BSTree_get(BSTree *map, void *key)
 {
+	check(map, "map can't be NULL");
+	check(key, "key can't be NULL");
+
 	if(map->root == NULL) {
 		return NULL;
 	} else {
 		BSTreeNode *node = BSTree_getnode(map, map->root, key);
 		return node == NULL ? NULL : node->data;
 	}
+
+error:
+	return NULL;
 }
 
 static inline int BSTree_traverse_nodes(BSTreeNode *node, BSTree_traverse_cb traverse_cb)
@@ -250,6 +260,7 @@ static inline BSTreeNode *BSTree_node_delete(BSTree *map, BSTreeNode *node, void
 void *BSTree_delete(BSTree *map, void *key)
 {
 	check(map, "map can't be NULL");
+	check(key, "key can't be NULL");
 
 	void *data = NULL;
 	
