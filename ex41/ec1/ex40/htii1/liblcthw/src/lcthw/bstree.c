@@ -178,7 +178,34 @@ int BSTree_traverse(BSTree *map, BSTree_traverse_cb traverse_cb)
 		return BSTree_traverse_nodes(map->root, traverse_cb);
 	}
 
-	return 0;
+error:
+	return -1;
+}
+
+static inline int BSTree_traverse_nodes_reverse(BSTreeNode *node, BSTree_traverse_cb traverse_cb)
+{
+	int rc = traverse_cb(node);
+
+	if(node->right) {
+		rc = BSTree_traverse_nodes_reverse(node->right, traverse_cb);
+		if(rc != 0) return rc;
+	}
+
+	if(node->left) {
+		rc = BSTree_traverse_nodes_reverse(node->left, traverse_cb);
+		if(rc != 0) return rc;
+	}
+
+	return rc;
+}
+
+int BSTree_traverse_reverse(BSTree *map, BSTree_traverse_cb traverse_cb)
+{
+	check(map, "map can't be NULL");
+
+	if(map->root) {
+		return BSTree_traverse_nodes_reverse(map->root, traverse_cb);
+	}
 
 error:
 	return -1;
