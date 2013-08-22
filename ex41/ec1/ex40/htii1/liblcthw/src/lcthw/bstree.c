@@ -228,29 +228,15 @@ static inline void BSTree_swap(BSTreeNode *a, BSTreeNode *b)
 	temp_hash = b->hash; b->hash = a->hash; a->hash = temp_hash;
 }
 
-static inline BSTreeNode *BSTree_node_delete(BSTree *map, BSTreeNode *node, void *key)
+static inline BSTreeNode *BSTree_node_delete(BSTree *map, BSTreeNode *node, uint32_t hash)
 {
-	int cmp = map->compare(node->key, key);
+	BSTreeNode *delete = BSTree_getnode(map, node, hash);
 
-	if(cmp < 0) {
-		if(node->left) {
-			return BSTree_node_delete(map, node->left, key);
-		} else {
-			// not found
-			return NULL;
-		}
-	} else if(cmp > 0) {
-		if(node->right) {
-			return BSTree_node_delete(map, node->right, key);
-		} else {
-			// not found
-			return NULL;
-		}
-	} else {
-		if(node->left && node->right) {
+	if(delete) {
+		if(delete->left && delete->right) {
 			// swap this node for the smallest node that is bigger than us
-			BSTreeNode *successor = BSTree_find_min(node->right);
-			BSTree_swap(successor, node);
+			BSTreeNode *successor = BSTree_find_min(delete->right);
+			BSTree_swap(successor, delete);
 
 			// this leaves the old successor with possibly a right child
 			// so replace it with the right child
@@ -258,16 +244,17 @@ static inline BSTreeNode *BSTree_node_delete(BSTree *map, BSTreeNode *node, void
 
 			// finally it's swapped, so return successor instead of node
 			return successor;
-		} else if(node->left) {
-			BSTree_replace_node_in_parent(map, node, node->left);
-		} else if(node->right) {
-			BSTree_replace_node_in_parent(map, node, node->right);
-		} else {
-			BSTree_replace_node_in_parent(map, node, NULL);
-		}
 
-		return node;
+		} else if(delete->left) {
+			BSTree_replace_node_in_parent(map, delete, delete->left);
+		} else if(delete->right) {
+			BSTree_replace_node_in_parent(map, delete, delete->right);
+		} else {
+			BSTree_replace_node_in_parent(map, delete, NULL);
+		}
 	}
+
+	return delete;
 }
 
 void *BSTree_delete(BSTree *map, void *key)
@@ -276,9 +263,12 @@ void *BSTree_delete(BSTree *map, void *key)
 	check(key, "key can't be NULL");
 
 	void *data = NULL;
+
+	uint32_t hash = 0;
 	
 	if(map->root) {
-		BSTreeNode *node = BSTree_node_delete(map, map->root, key);
+		hash = map->hash_func(key);
+		BSTreeNode *node = BSTree_node_delete(map, map->root, hash);
 
 		if(node) {
 			data = node->data;
