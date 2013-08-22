@@ -66,19 +66,21 @@ static inline int BSTree_setnode(BSTree *map, BSTreeNode *node, void *key, void 
 	check(key, "key can't be NULL");
 
 	int cmp = map->compare(node->key, key);
-	
-	if(cmp <= 0) {
+
+	if(cmp < 0) {
 		if(node->left) {
 			BSTree_setnode(map, node->left, key, data);
 		} else {
 			node->left = BSTreeNode_create(map, node, key, data);
 		}
-	} else {
+	} else if(cmp > 0){
 		if(node->right) {
 			BSTree_setnode(map, node->right, key, data);
 		} else {
 			node->right = BSTreeNode_create(map, node, key, data);
 		}
+	} else {
+		node->data = data;
 	}
 	
 	return 0;
@@ -92,14 +94,11 @@ int BSTree_set(BSTree *map, void *key, void *data)
 	check(map, "map can't be NULL");
 	check(key, "key can't be NULL");
 
-	uint32_t hash = 0;
-
 	if(map->root == NULL) {
 		// first so just make it and get out
 		map->root = BSTreeNode_create(map, NULL, key, data);
 		check_mem(map->root);
 	} else {
-		hash = map->hash_func(key);
 		BSTree_setnode(map, map->root, key, data);
 	}
 
@@ -108,29 +107,28 @@ error:
 	return -1;
 }
 
-static inline BSTreeNode *BSTree_getnode(BSTree *map, BSTreeNode *node, void *key)
+static inline BSTreeNode *BSTree_getnode(BSTree *map, BSTreeNode *node, uint32_t hash)
 {
 	check(map, "map can't be NULL");
 	check(node, "node can't be NULL");
-	check(key, "key can't be NULL");
 
-	int cmp = map->compare(node->key, key);
+	BSTreeNode *found = NULL;
 
-	if(cmp == 0) {
+	if(node->hash == hash) {
 		return node;
-	} else if(cmp < 0) {
-		if(node->left) {
-			return BSTree_getnode(map, node->left, key);
-		} else {
-			return NULL;
-		}
-	} else {
-		if(node->right) {
-			return BSTree_getnode(map, node->right, key);
-		} else {
-			return NULL;
-		}
+	} 
+	
+	if(node->left) {
+		found = BSTree_getnode(map, node->left, hash);
+		if(found) return found;
 	}
+
+	if(node->right) {
+		found = BSTree_getnode(map, node->right, hash);
+		if(found) return found;
+	}
+	
+	return found;
 
 error:
 	return BSTREE_ERROR_POINTER;
@@ -147,7 +145,7 @@ void *BSTree_get(BSTree *map, void *key)
 		return NULL;
 	} else {
 		hash = map->hash_func(key);
-		BSTreeNode *node = BSTree_getnode(map, map->root, key);
+		BSTreeNode *node = BSTree_getnode(map, map->root, hash);
 		return node == NULL ? NULL : node->data;
 	}
 
