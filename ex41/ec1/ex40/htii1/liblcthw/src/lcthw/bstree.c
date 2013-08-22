@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <lcthw/bstrlib.h>
 
-static char BSTREE_ERROR;
-#define BSTREE_ERROR_POINTER ((void *)&BSTREE_ERROR)
+char BSTREE_ERROR;
 
 static int default_compare(void *a, void *b)
 {

@@ -1,6 +1,9 @@
 #ifndef _lcthw_BSTree_h
 #define _lcthw_BSTree_h
 
+extern char BSTREE_ERROR;
+#define BSTREE_ERROR_POINTER ((void *)&BSTREE_ERROR)
+
 typedef int (*BSTree_compare)(void *a, void *b);
 
 typedef struct BSTreeNode {
