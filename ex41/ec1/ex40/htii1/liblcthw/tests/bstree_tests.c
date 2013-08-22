@@ -70,14 +70,37 @@ char *test_get_set()
 
 char *test_traverse()
 {
+	debug("traverse_good_cb");
+
 	int rc = BSTree_traverse(map, traverse_good_cb);
 	mu_assert(rc == 0, "Failed to traverse.");
 	mu_assert(traverse_called == 3, "Wrong count traverse.");
+
+	debug("traverse_fail_cb");
 
 	traverse_called = 0;
 	rc = BSTree_traverse(map, traverse_fail_cb);
 	mu_assert(rc == 1, "Failed to traverse.");
 	mu_assert(traverse_called == 2, "Wrong count traverse for fail.");
+
+	return NULL;
+}
+
+char *test_traverse_reverse()
+{
+	debug("traverse_good_cb");
+
+	traverse_called = 0;
+	int rc = BSTree_traverse_reverse(map, traverse_good_cb);
+	mu_assert(rc == 0, "Failed to traverse in a reverse order.");
+	mu_assert(traverse_called == 3, "Wrong count traverse in a reverse order.");
+
+	debug("traverse_fail_cb");
+
+	traverse_called = 0;
+	rc = BSTree_traverse_reverse(map, traverse_fail_cb);
+	mu_assert(rc == 1, "Failed to traverse in a reverse order.");
+	mu_assert(traverse_called == 2, "Wrong count traverse in a reverse order for fail.");
 
 	return NULL;
 }
@@ -155,6 +178,7 @@ char *all_tests()
 	mu_run_test(test_create);
 	mu_run_test(test_get_set);
 	mu_run_test(test_traverse);
+	mu_run_test(test_traverse_reverse);
 	mu_run_test(test_delete);
 	mu_run_test(test_destroy);
 	mu_run_test(test_fuzzing);
