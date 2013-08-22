@@ -2,6 +2,7 @@
 #include <lcthw/bstree.h>
 #include <stdlib.h>
 #include <lcthw/bstrlib.h>
+#include <assert.h>
 
 static int default_compare(void *a, void *b)
 {
@@ -52,8 +53,11 @@ error:
 	return NULL;
 }
 
-static inline void BSTree_setnode(BSTree *map, BSTreeNode *node, void *key, void *data)
+static inline int BSTree_setnode(BSTree *map, BSTreeNode *node, void *key, void *data)
 {
+	check(map, "map can't be NULL");
+	check(node, "node can't be NULL");
+
 	int cmp = map->compare(node->key, key);
 	
 	if(cmp <= 0) {
@@ -69,10 +73,17 @@ static inline void BSTree_setnode(BSTree *map, BSTreeNode *node, void *key, void
 			node->right = BSTreeNode_create(node, key, data);
 		}
 	}
+	
+	return 0;
+
+error:
+	return -1;
 }
 
 int BSTree_set(BSTree *map, void *key, void *data)
 {
+	check(map, "map can't be NULL");
+
 	if(map->root == NULL) {
 		// first so just make it and get out
 		map->root = BSTreeNode_create(NULL, key, data);
@@ -88,6 +99,8 @@ error:
 
 static inline BSTreeNode *BSTree_getnode(BSTree *map, BSTreeNode *node, void *key)
 {
+	check(map, "map can't be NULL");
+
 	int cmp = map->compare(node->key, key);
 
 	if(cmp == 0) {
@@ -105,6 +118,9 @@ static inline BSTreeNode *BSTree_getnode(BSTree *map, BSTreeNode *node, void *ke
 			return NULL;
 		}
 	}
+
+error:
+	return NULL;
 }
 
 void *BSTree_get(BSTree *map, void *key)
@@ -136,11 +152,16 @@ static inline int BSTree_traverse_nodes(BSTreeNode *node, BSTree_traverse_cb tra
 
 int BSTree_traverse(BSTree *map, BSTree_traverse_cb traverse_cb)
 {
+	check(map, "map can't be NULL");
+
 	if(map->root) {
 		return BSTree_traverse_nodes(map->root, traverse_cb);
 	}
 
 	return 0;
+
+error:
+	return -1;
 }
 
 static inline BSTreeNode *BSTree_find_min(BSTreeNode *node)
@@ -152,8 +173,10 @@ static inline BSTreeNode *BSTree_find_min(BSTreeNode *node)
 	return node;
 }
 
-static inline void BSTree_replace_node_in_parent(BSTree *map, BSTreeNode *node, BSTreeNode *new_value)
+static inline int BSTree_replace_node_in_parent(BSTree *map, BSTreeNode *node, BSTreeNode *new_value)
 {
+	check(map, "map can't be NULL");
+
 	if(node->parent) {
 		if(node == node->parent->left) {
 			node->parent->left = new_value;
@@ -168,6 +191,11 @@ static inline void BSTree_replace_node_in_parent(BSTree *map, BSTreeNode *node, 
 	if(new_value) {
 		new_value->parent = node->parent;
 	}
+
+	return 0;
+
+error:
+	return -1;
 }
 
 static inline void BSTree_swap(BSTreeNode *a, BSTreeNode *b)
@@ -221,6 +249,8 @@ static inline BSTreeNode *BSTree_node_delete(BSTree *map, BSTreeNode *node, void
 
 void *BSTree_delete(BSTree *map, void *key)
 {
+	check(map, "map can't be NULL");
+
 	void *data = NULL;
 	
 	if(map->root) {
@@ -233,4 +263,7 @@ void *BSTree_delete(BSTree *map, void *key)
 	}
 
 	return data;
+
+error:
+	return NULL;
 }
