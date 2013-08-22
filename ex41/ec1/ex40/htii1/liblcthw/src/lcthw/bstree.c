@@ -185,6 +185,7 @@ error:
 static inline int BSTree_traverse_nodes_reverse(BSTreeNode *node, BSTree_traverse_cb traverse_cb)
 {
 	int rc = traverse_cb(node);
+	if(rc != 0) return rc;
 
 	if(node->right) {
 		rc = BSTree_traverse_nodes_reverse(node->right, traverse_cb);
