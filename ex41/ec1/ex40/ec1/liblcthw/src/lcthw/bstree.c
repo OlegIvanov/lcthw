@@ -198,7 +198,7 @@ static inline BSTreeNode *BSTree_node_delete(BSTree *map, BSTreeNode *node, void
 			return successor;
 		} else if(delete->left) {
 			BSTree_replace_node_in_parent(map, delete, delete->left);
-		} else if(node->right) {
+		} else if(delete->right) {
 			BSTree_replace_node_in_parent(map, delete, delete->right);
 		} else {
 			BSTree_replace_node_in_parent(map, delete, NULL);
