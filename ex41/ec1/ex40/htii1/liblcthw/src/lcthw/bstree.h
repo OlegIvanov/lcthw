@@ -20,6 +20,9 @@ typedef struct BSTree {
 
 typedef int (*BSTree_traverse_cb)(BSTreeNode *node);
 
+extern char BSTREE_ERROR = 0;
+#define BSTREE_ERROR_POINTER ((void *)&BSTREE_ERROR)
+
 BSTree *BSTree_create(BSTree_compare compare);
 void BSTree_destroy(BSTree *map);
 

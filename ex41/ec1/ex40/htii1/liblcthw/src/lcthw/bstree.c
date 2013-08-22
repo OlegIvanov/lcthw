@@ -2,7 +2,6 @@
 #include <lcthw/bstree.h>
 #include <stdlib.h>
 #include <lcthw/bstrlib.h>
-#include <assert.h>
 
 static int default_compare(void *a, void *b)
 {
@@ -41,6 +40,8 @@ void BSTree_destroy(BSTree *map)
 
 static inline BSTreeNode *BSTreeNode_create(BSTreeNode *parent, void *key, void *data)
 {
+	check(key, "key can't be NULL");
+
 	BSTreeNode *node = calloc(1, sizeof(BSTreeNode));
 	check_mem(node);
 
@@ -124,7 +125,7 @@ static inline BSTreeNode *BSTree_getnode(BSTree *map, BSTreeNode *node, void *ke
 	}
 
 error:
-	return NULL;
+	return BSTREE_ERROR_POINTER;
 }
 
 void *BSTree_get(BSTree *map, void *key)
@@ -140,7 +141,7 @@ void *BSTree_get(BSTree *map, void *key)
 	}
 
 error:
-	return NULL;
+	return BSTREE_ERROR_POINTER;
 }
 
 static inline int BSTree_traverse_nodes(BSTreeNode *node, BSTree_traverse_cb traverse_cb)
